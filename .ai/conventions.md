@@ -5,6 +5,7 @@
 - Respond to the maintainer in Japanese (their working language). Code identifiers are in English.
 - This context and the README are written in English for the public repository. `docs/plan.md` is the Japanese specification.
 - For code comments, match the language of the surrounding code.
+- **Keep `README.md` (English) and `README.ja.md` (Japanese) in sync.** Any change to one must be made to the other in the same commit: same sections, same order, same facts. Do not leave one version behind.
 
 ## Coding conventions
 

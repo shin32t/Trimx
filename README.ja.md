@@ -26,6 +26,12 @@ Windows 11 向けの軽量画像編集アプリ。`Win + Shift + S` でスクリ
 
 ショートカットの一覧は [仕様書](docs/plan.md)（日本語）の 7.2 を参照してください。
 
+## インストール
+
+[Releases](https://github.com/shin32t/Trimx/releases) からインストーラ（`Trimx-<バージョン>-win-x64-setup.exe`）またはポータブル版の zip（`Trimx-<バージョン>-win-x64.zip`）をダウンロードしてください。インストーラは管理者権限が不要で、既定では `%LOCALAPPDATA%\Programs\Trimx` にインストールされます。
+
+> **Windows SmartScreen の警告:** Trimx はコード署名をしていないため、インストーラの実行時に「Windows によって PC が保護されました」と表示されることがあります。**詳細情報** をクリックし、**実行** を選んでください。
+
 ## 技術スタック
 
 | 項目 | 採用技術 |
