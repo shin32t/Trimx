@@ -30,6 +30,12 @@ Trimx has no screen-capture feature of its own. It relies on the built-in Window
 
 See section 7.2 of the [specification](docs/plan.md) (Japanese) for the full list of shortcuts.
 
+## Install
+
+Download the installer (`Trimx-<version>-win-x64-setup.exe`) or the portable zip (`Trimx-<version>-win-x64.zip`) from the [Releases](https://github.com/shin32t/Trimx/releases) page. The installer does not need administrator rights and installs to `%LOCALAPPDATA%\Programs\Trimx` by default.
+
+> **Windows SmartScreen warning:** Trimx is not code-signed, so Windows may show "Windows protected your PC" when you run the installer. Click **More info**, then **Run anyway**.
+
 ## Tech stack
 
 | Item | Technology |
