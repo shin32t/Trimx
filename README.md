@@ -83,6 +83,8 @@ dotnet run --project src/Trimx/Trimx.csproj
 
 `installer/build.ps1` publishes the app (win-x64, self-contained .NET runtime, ReadyToRun), creates a portable zip, and builds an installer if Inno Setup 6 or later is available. Output goes to `installer/output/`. The binaries are not code-signed, so Windows SmartScreen shows a warning.
 
+Releases are created by GitHub Actions (`.github/workflows/release.yml`). Set `<Version>` in `src/Trimx/Trimx.csproj`, then push a tag such as `v0.2.0`; a draft release with the installer and zip is created for review.
+
 ## Where data is stored
 
 Trimx creates two files in `%LOCALAPPDATA%\Trimx\`:
