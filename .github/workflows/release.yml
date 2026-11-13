@@ -1,0 +1,104 @@
+name: Release
+
+# How to release:
+#   1. Set <Version> in src/Trimx/Trimx.csproj (e.g. 0.2.0) and merge it to main.
+#   2. git tag v0.2.0 ; git push origin v0.2.0
+#   3. A DRAFT release is created with the installer and the zip. Check it on the Releases page, then Publish.
+#
+# To test the build without creating a release, run this workflow by hand from the Actions tab
+# ("Run workflow"). The files are then attached to the run as an artifact instead.
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+permissions:
+  contents: write   # needed to create the release
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Read the version from the project file
+        id: version
+        shell: pwsh
+        run: |
+          $project = 'src/Trimx/Trimx.csproj'
+          $version = ([xml](Get-Content $project -Raw)).Project.PropertyGroup.Version | Where-Object { $_ } | Select-Object -First 1
+          if (-not $version) { throw "Version was not found in $project." }
+          "version=$version" >> $env:GITHUB_OUTPUT
+          Write-Host "Project version: $version"
+
+      - name: Check that the tag matches the project version
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if ($env:TAG -ne "v$($env:VERSION)") {
+            throw "Tag '$($env:TAG)' does not match <Version> '$($env:VERSION)' in Trimx.csproj. Fix one of them and tag again."
+          }
+
+      - name: Make sure Inno Setup is installed
+        shell: pwsh
+        run: |
+          $found = @('Inno Setup 7', 'Inno Setup 6') | ForEach-Object {
+            Join-Path ${env:ProgramFiles(x86)} "$_\ISCC.exe"
+            Join-Path $env:ProgramFiles "$_\ISCC.exe"
+          } | Where-Object { Test-Path $_ } | Select-Object -First 1
+          if ($found) { Write-Host "Found $found" }
+          else {
+            Write-Host 'Inno Setup was not found on the runner. Installing it.'
+            choco install innosetup -y --no-progress
+            if ($LASTEXITCODE -ne 0) { throw 'Could not install Inno Setup.' }
+          }
+
+      - name: Build the installer and the zip
+        shell: pwsh
+        run: powershell -ExecutionPolicy Bypass -File installer\build.ps1
+
+      - name: Check the output
+        shell: pwsh
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          foreach ($name in "Trimx-$($env:VERSION)-win-x64-setup.exe", "Trimx-$($env:VERSION)-win-x64.zip") {
+            $path = Join-Path 'installer\output' $name
+            if (-not (Test-Path $path)) { throw "Expected file was not created: $path" }
+            Write-Host ("{0}  {1:N1} MB" -f $name, ((Get-Item $path).Length / 1MB))
+          }
+
+      - name: Create a draft release
+        if: startsWith(github.ref, 'refs/tags/')
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ github.ref_name }}
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          # A version with a suffix such as 0.2.0-rc.1 is marked as a pre-release.
+          $ghArgs = @('release', 'create', $env:TAG,
+            "installer\output\Trimx-$($env:VERSION)-win-x64-setup.exe",
+            "installer\output\Trimx-$($env:VERSION)-win-x64.zip",
+            '--draft', '--generate-notes', '--title', "Trimx $($env:VERSION)")
+          if ($env:VERSION -match '-') { $ghArgs += '--prerelease' }
+          gh @ghArgs
+          if ($LASTEXITCODE -ne 0) { throw 'gh release create failed.' }
+
+      - name: Keep the files as a run artifact (manual runs)
+        if: github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: trimx-${{ steps.version.outputs.version }}
+          path: |
+            installer/output/*.exe
+            installer/output/*.zip

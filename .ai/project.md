@@ -32,6 +32,7 @@ Always confirm the build passes after making changes.
 - The installer is per-user by default (no admin rights). Never change the `AppId` GUID; it identifies upgrades.
 - Binaries are not signed (SmartScreen warns). The app icon and README banner are in `assets/branding/`; `ApplicationIcon` embeds the multi-resolution `.ico` in the exe.
 - Release files include `LICENSE` and `THIRD-PARTY-NOTICES.md`.
+- Releases are automated by `.github/workflows/release.yml`: pushing a tag `vX.Y.Z` builds on a Windows runner with `installer/build.ps1` and creates a **draft** GitHub Release (installer + zip, generated notes). The tag must equal `v` + `<Version>` in `src/Trimx/Trimx.csproj`, or the run fails. "Run workflow" in the Actions tab builds without releasing and keeps the files as an artifact. The workflow has not run on GitHub yet.
 - The published exe has been verified to start (window shown, clean exit). The installer builds successfully with Inno Setup 7.1.1 (`installer/output/Trimx-<version>-win-x64-setup.exe`, about 60 MB), but installing and uninstalling it has not been tested.
 
 ## Implementation status

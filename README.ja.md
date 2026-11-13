@@ -79,6 +79,8 @@ dotnet run --project src/Trimx/Trimx.csproj
 
 `installer/build.ps1` で、発行（win-x64・.NET ランタイム同梱・ReadyToRun）→ ポータブル zip → インストーラ（Inno Setup 6 以降がある場合）を作成します。出力は `installer/output/` です。コード署名はしていないため、SmartScreen の警告が出ます。
 
+リリースは GitHub Actions（`.github/workflows/release.yml`）で作成します。`src/Trimx/Trimx.csproj` の `<Version>` を更新してから `v0.2.0` のようなタグを push すると、インストーラと zip を添えた下書きの Release が作られます。内容を確認して公開してください。
+
 ## 保存先
 
 `%LOCALAPPDATA%\Trimx\` に次の 2 ファイルを作成します。
