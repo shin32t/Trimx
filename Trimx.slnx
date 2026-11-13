@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="src/Trimx.Core/Trimx.Core.csproj" />
+  <Project Path="src/Trimx/Trimx.csproj" />
+</Solution>

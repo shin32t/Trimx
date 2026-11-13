@@ -1,0 +1,459 @@
+<Window x:Class="Trimx.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:ui="clr-namespace:Trimx.UI"
+        xmlns:core="clr-namespace:Trimx.Core.Documents;assembly=Trimx.Core"
+        Title="Trimx"
+        Width="1100"
+        Height="720"
+        AllowDrop="True"
+        DragOver="OnDragOver"
+        Drop="OnDrop"
+        Background="{DynamicResource WindowBackgroundBrush}"
+        Foreground="{DynamicResource ForegroundBrush}">
+    <Window.InputBindings>
+        <KeyBinding Key="S"
+                    Modifiers="Control+Shift"
+                    Command="{x:Static ApplicationCommands.SaveAs}" />
+    </Window.InputBindings>
+    <Window.CommandBindings>
+        <CommandBinding Command="{x:Static ApplicationCommands.Open}"
+                        Executed="OnOpen" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Save}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnSave" />
+        <CommandBinding Command="{x:Static ApplicationCommands.SaveAs}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnSaveAs" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.Export}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnExport" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Copy}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnCopy" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Cut}"
+                        CanExecute="CanCut"
+                        Executed="OnCut" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.Crop}"
+                        CanExecute="CanCrop"
+                        Executed="OnCrop" />
+        <CommandBinding Command="{x:Static ApplicationCommands.New}"
+                        Executed="OnNew" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Paste}"
+                        Executed="OnPaste" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Undo}"
+                        CanExecute="CanUndo"
+                        Executed="OnUndo" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Redo}"
+                        CanExecute="CanRedo"
+                        Executed="OnRedo" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.FitToView}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnFitToView" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.ZoomIn}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnZoomIn" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.ZoomOut}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnZoomOut" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.ActualSize}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnActualSize" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.AddText}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnAddText" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.AddShape}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnAddShape" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.ResizeCanvas}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnResizeCanvas" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.ResizeImage}"
+                        CanExecute="CanExecuteWithDocument"
+                        Executed="OnResizeImage" />
+        <CommandBinding Command="{x:Static ApplicationCommands.Delete}"
+                        CanExecute="CanDeleteLayer"
+                        Executed="OnDeleteLayer" />
+        <CommandBinding Command="{x:Static ui:EditorCommands.CloseTab}"
+                        Executed="OnCloseTab" />
+    </Window.CommandBindings>
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Toolbar -->
+        <Border Grid.Row="0"
+                Padding="4"
+                Background="{DynamicResource PanelBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,0,0,1">
+            <!-- Left: file. Center: drawing tools. Right: clipboard and canvas. Labels are the tooltips. -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE8A5;"
+                            Content="新規"
+                            ToolTip="新規 (Ctrl+N)"
+                            Command="{x:Static ApplicationCommands.New}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xED25;"
+                            Content="開く"
+                            ToolTip="開く: プロジェクトまたは画像 (Ctrl+O)"
+                            Command="{x:Static ApplicationCommands.Open}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE74E;"
+                            Content="保存"
+                            ToolTip="保存: プロジェクト (Ctrl+S / 名前を付けて保存: Ctrl+Shift+S)"
+                            Command="{x:Static ApplicationCommands.Save}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xEE71;"
+                            Content="書き出し"
+                            ToolTip="書き出し: PNG / JPEG / WebP (Ctrl+E)"
+                            Command="{x:Static ui:EditorCommands.Export}" />
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <!-- Pen: turns on drawing mode; the popup sets color and thickness. -->
+                    <Border x:Name="PenButtonHost"
+                            CornerRadius="4"
+                            Background="Transparent">
+                        <Button x:Name="PenButton"
+                                Style="{StaticResource ToolBarButtonStyle}"
+                                Tag="&#xE70F;"
+                                Content="ペン"
+                                ToolTip="ペン: 描く (Esc で終了)"
+                                Click="OnPenButtonClick" />
+                    </Border>
+                    <Popup x:Name="PenPopup"
+                           PlacementTarget="{Binding ElementName=PenButton}"
+                           Placement="Bottom"
+                           StaysOpen="False"
+                           AllowsTransparency="False">
+                        <Border Width="260"
+                                Padding="14"
+                                Background="{DynamicResource PanelBackgroundBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1">
+                            <StackPanel>
+                                <TextBlock FontWeight="SemiBold"
+                                           Foreground="{DynamicResource ForegroundBrush}"
+                                           Text="色" />
+                                <UniformGrid x:Name="PenColorGrid"
+                                             Margin="0,8,0,0"
+                                             Columns="6" />
+                                <TextBlock Margin="0,10,0,0"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           Text="マイカラー (「その他の色…」で選んだ色)" />
+                                <StackPanel x:Name="MyColorPanel"
+                                            Margin="0,4,0,0"
+                                            Orientation="Horizontal" />
+                                <Button x:Name="PenCustomButton"
+                                        Margin="0,8,0,0"
+                                        Content="その他の色…"
+                                        ToolTip="カラーピッカーで細かく色を選ぶ"
+                                        Click="OnPenCustomClick" />
+
+                                <TextBlock Margin="0,14,0,0"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource ForegroundBrush}"
+                                           Text="サイズ" />
+                                <Border Height="64"
+                                        Margin="0,6,0,0"
+                                        ClipToBounds="True"
+                                        Background="White">
+                                    <Path x:Name="PenPreview"
+                                          Data="M 16,40 C 70,0 130,70 224,24"
+                                          StrokeStartLineCap="Round"
+                                          StrokeEndLineCap="Round"
+                                          StrokeLineJoin="Round" />
+                                </Border>
+                                <Slider x:Name="PenWidthSlider"
+                                        Margin="0,8,0,0"
+                                        Minimum="1"
+                                        Maximum="40"
+                                        ValueChanged="OnPenWidthChanged" />
+                                <TextBlock x:Name="PenWidthText"
+                                           HorizontalAlignment="Right"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                                <Button Margin="0,10,0,0"
+                                        Content="ペンをやめる"
+                                        Click="OnPenStopClick" />
+                            </StackPanel>
+                        </Border>
+                    </Popup>
+                    <!-- Shapes: one button that opens a row of shape kinds, so the toolbar stays short. -->
+                    <Button x:Name="ShapeMenuButton"
+                            Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE739;"
+                            Content="図形"
+                            ToolTip="図形: 種類を選んで追加"
+                            Click="OnShapeMenuButtonClick" />
+                    <Popup x:Name="ShapePopup"
+                           PlacementTarget="{Binding ElementName=ShapeMenuButton}"
+                           Placement="Bottom"
+                           StaysOpen="False"
+                           AllowsTransparency="False">
+                        <Border Padding="4"
+                                Background="{DynamicResource PanelBackgroundBrush}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1">
+                            <StackPanel Orientation="Horizontal">
+                                <Button Style="{StaticResource ToolBarButtonStyle}"
+                                        Tag="&#xE739;"
+                                        Content="矩形"
+                                        ToolTip="矩形を追加"
+                                        Command="{x:Static ui:EditorCommands.AddShape}"
+                                        CommandParameter="{x:Static core:ShapeKind.Rectangle}"
+                                        Click="OnShapeChosen" />
+                                <Button Style="{StaticResource ToolBarButtonStyle}"
+                                        Tag="&#xEA3A;"
+                                        Content="楕円"
+                                        ToolTip="楕円を追加"
+                                        Command="{x:Static ui:EditorCommands.AddShape}"
+                                        CommandParameter="{x:Static core:ShapeKind.Ellipse}"
+                                        Click="OnShapeChosen" />
+                                <Button Style="{StaticResource ToolBarButtonStyle}"
+                                        Tag="&#xE738;"
+                                        Content="線"
+                                        ToolTip="線を追加"
+                                        Command="{x:Static ui:EditorCommands.AddShape}"
+                                        CommandParameter="{x:Static core:ShapeKind.Line}"
+                                        Click="OnShapeChosen" />
+                                <Button Style="{StaticResource ToolBarButtonStyle}"
+                                        Tag="&#xEDE1;"
+                                        Content="矢印"
+                                        ToolTip="矢印を追加"
+                                        Command="{x:Static ui:EditorCommands.AddShape}"
+                                        CommandParameter="{x:Static core:ShapeKind.Arrow}"
+                                        Click="OnShapeChosen" />
+                            </StackPanel>
+                        </Border>
+                    </Popup>
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE8D2;"
+                            Content="テキスト"
+                            ToolTip="テキスト: レイヤーを追加"
+                            Command="{x:Static ui:EditorCommands.AddText}" />
+                    <Border Width="1"
+                            Margin="6,4"
+                            Background="{DynamicResource BorderBrush}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE8C6;"
+                            Content="切り取り"
+                            ToolTip="切り取り: 選択範囲を選択中の画像レイヤーからコピーして消す (Ctrl+X)"
+                            Command="{x:Static ApplicationCommands.Cut}" />
+                    <Border x:Name="SelectButtonHost"
+                            CornerRadius="4"
+                            Background="Transparent">
+                        <Button x:Name="SelectButton"
+                                Style="{StaticResource ToolBarButtonStyle}"
+                                Tag="&#xE799;"
+                                Content="範囲選択"
+                                ToolTip="範囲選択: ドラッグで範囲を選ぶ (Esc で解除)"
+                                Click="OnSelectButtonClick" />
+                    </Border>
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE7A8;"
+                            Content="切り抜き"
+                            ToolTip="切り抜き: キャンバスを選択範囲の大きさにする"
+                            Command="{x:Static ui:EditorCommands.Crop}" />
+                    <Border Width="1"
+                            Margin="6,4"
+                            Background="{DynamicResource BorderBrush}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xEE47;"
+                            Content="キャンバス"
+                            ToolTip="キャンバスサイズ: 変更 (画像は拡大縮小しない)"
+                            Command="{x:Static ui:EditorCommands.ResizeCanvas}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE740;"
+                            Content="画像サイズ"
+                            ToolTip="画像サイズ: 画像全体を拡大縮小"
+                            Command="{x:Static ui:EditorCommands.ResizeImage}" />
+                    <Border Width="1"
+                            Margin="6,4"
+                            Background="{DynamicResource BorderBrush}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE9A6;"
+                            Content="フィット"
+                            ToolTip="フィット: 画面に合わせる (Ctrl+0)"
+                            Command="{x:Static ui:EditorCommands.FitToView}" />
+                    <Border Width="1"
+                            Margin="6,4"
+                            Background="{DynamicResource BorderBrush}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE7A7;"
+                            Content="元に戻す"
+                            ToolTip="元に戻す (Ctrl+Z)"
+                            Command="{x:Static ApplicationCommands.Undo}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE7A6;"
+                            Content="やり直し"
+                            ToolTip="やり直し (Ctrl+Y)"
+                            Command="{x:Static ApplicationCommands.Redo}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE77F;"
+                            Content="貼り付け"
+                            ToolTip="貼り付け: クリップボードの画像 (Ctrl+V)"
+                            Command="{x:Static ApplicationCommands.Paste}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE8C8;"
+                            Content="コピー"
+                            ToolTip="コピー: 編集結果をクリップボードへ。範囲選択中は、選択レイヤーの選択範囲だけ (Ctrl+C)"
+                            Command="{x:Static ApplicationCommands.Copy}" />
+                    <Border Width="1"
+                            Margin="6,4"
+                            Background="{DynamicResource BorderBrush}" />
+                    <Button Style="{StaticResource ToolBarButtonStyle}"
+                            Tag="&#xE713;"
+                            Content="設定"
+                            ToolTip="設定: テーマ・ツールバーの表示など"
+                            Click="OnSettingsClick" />
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Tabs -->
+        <ListBox x:Name="TabStrip"
+                 Grid.Row="1"
+                 Style="{StaticResource TabStripStyle}"
+                 SelectionChanged="OnActiveTabChanged">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock VerticalAlignment="Center"
+                                   Text="{Binding DisplayTitle}" />
+                        <Button Margin="8,0,0,0"
+                                Style="{StaticResource TabCloseButtonStyle}"
+                                Content="×"
+                                ToolTip="閉じる"
+                                Command="{x:Static ui:EditorCommands.CloseTab}"
+                                CommandParameter="{Binding}" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <!-- Canvas and layer panel -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"
+                                  MinWidth="200" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition x:Name="SidePanelColumn"
+                                  Width="240"
+                                  MinWidth="200"
+                                  MaxWidth="600" />
+            </Grid.ColumnDefinitions>
+
+            <ui:CanvasView x:Name="Canvas"
+                           Grid.Column="0" />
+            <TextBlock x:Name="EmptyHint"
+                       Grid.Column="0"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"
+                       IsHitTestVisible="False"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       TextAlignment="Center"
+                       Text="Ctrl+V でクリップボードの画像を開く&#x0a;Ctrl+N で新規画像を作成" />
+
+            <!-- Drag to change the width of the side panel (the canvas takes the rest). -->
+            <GridSplitter Grid.Column="1"
+                          Width="5"
+                          HorizontalAlignment="Center"
+                          VerticalAlignment="Stretch"
+                          Background="{DynamicResource BorderBrush}"
+                          ResizeDirection="Columns"
+                          ResizeBehavior="PreviousAndNext"
+                          DragCompleted="OnSidePanelSplitterDragCompleted"
+                          ToolTip="ドラッグして幅を変更" />
+
+            <Border Grid.Column="2"
+                    Background="{DynamicResource PanelBackgroundBrush}">
+                <!-- Properties (inspector) on top, layers below. The user sets the split; it never changes by itself. -->
+                <Grid x:Name="SidePanelGrid"
+                      SizeChanged="OnSidePanelGridSizeChanged">
+                    <Grid.RowDefinitions>
+                        <RowDefinition x:Name="InspectorRow"
+                                       Height="280"
+                                       MinHeight="80" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*"
+                                       MinHeight="150" />
+                    </Grid.RowDefinitions>
+                    <ScrollViewer Grid.Row="0"
+                                  VerticalScrollBarVisibility="Auto">
+                        <ui:PropertiesPanel x:Name="PropertiesPanel" />
+                    </ScrollViewer>
+                    <GridSplitter Grid.Row="1"
+                                  Height="5"
+                                  HorizontalAlignment="Stretch"
+                                  VerticalAlignment="Center"
+                                  Background="{DynamicResource BorderBrush}"
+                                  ResizeDirection="Rows"
+                                  ResizeBehavior="PreviousAndNext"
+                                  DragCompleted="OnInspectorSplitterDragCompleted"
+                                  ToolTip="ドラッグして高さを変更" />
+                    <ui:LayerPanel x:Name="LayerPanel"
+                                   Grid.Row="2" />
+                </Grid>
+            </Border>
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="3"
+                Background="{DynamicResource PanelBackgroundBrush}"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,1,0,0">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="ZoomButton"
+                        Style="{StaticResource TabCloseButtonStyle}"
+                        Padding="10,3"
+                        ToolTip="表示倍率 (クリックで倍率を選択)"
+                        Click="OnZoomButtonClick">
+                    <TextBlock x:Name="ZoomText"
+                               MinWidth="40"
+                               FontSize="12"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                </Button>
+                <Popup x:Name="ZoomPopup"
+                       PlacementTarget="{Binding ElementName=ZoomButton}"
+                       Placement="Top"
+                       StaysOpen="False">
+                    <Border Width="150"
+                            Background="{DynamicResource PanelBackgroundBrush}"
+                            BorderBrush="{DynamicResource BorderBrush}"
+                            BorderThickness="1">
+                        <ListBox x:Name="ZoomList"
+                                 Style="{StaticResource LayerListStyle}"
+                                 SelectionChanged="OnZoomPresetSelected">
+                            <ListBoxItem Tag="4"
+                                         Content="400%" />
+                            <ListBoxItem Tag="2"
+                                         Content="200%" />
+                            <ListBoxItem Tag="1"
+                                         Content="100% (等倍)" />
+                            <ListBoxItem Tag="0.5"
+                                         Content="50%" />
+                            <ListBoxItem Tag="0.25"
+                                         Content="25%" />
+                            <ListBoxItem Tag="fit"
+                                         Content="画面に合わせる" />
+                        </ListBox>
+                    </Border>
+                </Popup>
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

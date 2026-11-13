@@ -1,0 +1,35 @@
+# Build output
+bin/
+obj/
+publish/
+artifacts/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.userprefs
+
+# Test / coverage
+TestResults/
+*.trx
+coverage*.xml
+
+# NuGet
+*.nupkg
+*.snupkg
+
+# OS
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# AI tool local settings (shared context is tracked in .ai/)
+.claude/settings.local.json
+CLAUDE.local.md
+.gemini/settings.local.json
+
+# Installer build output
+installer/output/

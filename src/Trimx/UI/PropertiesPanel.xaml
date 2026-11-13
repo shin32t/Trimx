@@ -1,0 +1,225 @@
+<UserControl x:Class="Trimx.UI.PropertiesPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:Trimx.UI"
+             Background="{DynamicResource PanelBackgroundBrush}"
+             Foreground="{DynamicResource ForegroundBrush}"
+             LostKeyboardFocus="OnLostKeyboardFocus">
+    <UserControl.Resources>
+        <Style x:Key="FieldLabelStyle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="0,8,0,3" />
+            <Setter Property="Foreground" Value="{DynamicResource SecondaryForegroundBrush}" />
+        </Style>
+    </UserControl.Resources>
+
+    <Grid>
+    <TextBlock x:Name="EmptyText"
+               Margin="12,14,12,0"
+               Foreground="{DynamicResource SecondaryForegroundBrush}"
+               Text="テキストまたは図形のレイヤーを選ぶと、ここに設定が表示されます。"
+               TextWrapping="Wrap" />
+    <StackPanel x:Name="RootPanel"
+                Margin="10,4,10,10"
+                Visibility="Collapsed">
+        <TextBlock x:Name="HeaderText"
+                   Margin="0,8,0,0"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}" />
+
+        <!-- Text layer -->
+        <StackPanel x:Name="TextSection"
+                    Visibility="Collapsed">
+            <TextBlock Style="{StaticResource FieldLabelStyle}"
+                       Text="内容" />
+            <TextBox x:Name="ContentBox"
+                     MinHeight="56"
+                     MaxHeight="120"
+                     AcceptsReturn="True"
+                     TextWrapping="Wrap"
+                     VerticalScrollBarVisibility="Auto"
+                     TextChanged="OnContentChanged" />
+
+            <TextBlock Style="{StaticResource FieldLabelStyle}"
+                       Text="フォント" />
+            <Button x:Name="FontButton"
+                    HorizontalContentAlignment="Left"
+                    Click="OnFontButtonClick" />
+            <Popup x:Name="FontPopup"
+                   PlacementTarget="{Binding ElementName=FontButton}"
+                   Placement="Bottom"
+                   StaysOpen="False"
+                   AllowsTransparency="False">
+                <Border Width="216"
+                        Background="{DynamicResource PanelBackgroundBrush}"
+                        BorderBrush="{DynamicResource BorderBrush}"
+                        BorderThickness="1">
+                    <ListBox x:Name="FontList"
+                             MaxHeight="260"
+                             Style="{StaticResource LayerListStyle}"
+                             SelectionChanged="OnFontListSelectionChanged" />
+                </Border>
+            </Popup>
+
+            <TextBlock Style="{StaticResource FieldLabelStyle}"
+                       Text="サイズ (px)" />
+            <TextBox x:Name="FontSizeBox"
+                     TextChanged="OnFontSizeChanged" />
+
+            <StackPanel Margin="0,8,0,0"
+                        Orientation="Horizontal">
+                <CheckBox x:Name="BoldCheck"
+                          Margin="0,0,16,0"
+                          Content="太字"
+                          FontWeight="Bold"
+                          Click="OnBoldClick" />
+                <CheckBox x:Name="ItalicCheck"
+                          Content="斜体"
+                          FontStyle="Italic"
+                          Click="OnItalicClick" />
+            </StackPanel>
+
+            <TextBlock Style="{StaticResource FieldLabelStyle}"
+                       Text="文字色" />
+            <ui:ColorField x:Name="TextColorField"
+                           ColorChanged="OnTextColorChanged"
+                           EditCompleted="OnColorEditCompleted" />
+
+            <CheckBox x:Name="ShadowCheck"
+                      Margin="0,12,0,0"
+                      Content="影"
+                      Click="OnShadowClick" />
+            <StackPanel x:Name="ShadowOptions"
+                        Margin="0,0,0,0">
+                <DockPanel Margin="0,8,0,0">
+                    <TextBlock x:Name="ShadowOpacityText"
+                               Width="40"
+                               DockPanel.Dock="Right"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center" />
+                    <TextBlock VerticalAlignment="Center"
+                               Text="濃さ"
+                               Width="48" />
+                    <Slider x:Name="ShadowOpacitySlider"
+                            Minimum="0"
+                            Maximum="100"
+                            Thumb.DragCompleted="OnSliderDragCompleted"
+                            ValueChanged="OnShadowOpacityChanged" />
+                </DockPanel>
+                <DockPanel Margin="0,4,0,0">
+                    <TextBlock x:Name="ShadowBlurText"
+                               Width="40"
+                               DockPanel.Dock="Right"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center" />
+                    <TextBlock VerticalAlignment="Center"
+                               Text="ぼかし"
+                               Width="48" />
+                    <Slider x:Name="ShadowBlurSlider"
+                            Minimum="0"
+                            Maximum="40"
+                            Thumb.DragCompleted="OnSliderDragCompleted"
+                            ValueChanged="OnShadowBlurChanged" />
+                </DockPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Style="{StaticResource FieldLabelStyle}"
+                               Text="影のずれ 横 (px)" />
+                    <TextBox x:Name="ShadowOffsetXBox"
+                             TextChanged="OnShadowOffsetChanged" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Style="{StaticResource FieldLabelStyle}"
+                               Text="縦 (px)" />
+                    <TextBox x:Name="ShadowOffsetYBox"
+                             TextChanged="OnShadowOffsetChanged" />
+                </StackPanel>
+            </Grid>
+            </StackPanel>
+
+            <TextBlock Style="{StaticResource FieldLabelStyle}"
+                       Text="縁取りの太さ (px、0 で縁なし)" />
+            <TextBox x:Name="OutlineWidthBox"
+                     TextChanged="OnOutlineWidthChanged" />
+            <TextBlock Style="{StaticResource FieldLabelStyle}"
+                       Text="縁取りの色" />
+            <ui:ColorField x:Name="OutlineColorField"
+                           ColorChanged="OnOutlineColorChanged"
+                           EditCompleted="OnColorEditCompleted" />
+        </StackPanel>
+
+        <!-- Shape layer -->
+        <StackPanel x:Name="ShapeSection"
+                    Visibility="Collapsed">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Style="{StaticResource FieldLabelStyle}"
+                               Text="幅 (px)" />
+                    <TextBox x:Name="ShapeWidthBox"
+                             TextChanged="OnShapeWidthChanged" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Style="{StaticResource FieldLabelStyle}"
+                               Text="高さ (px)" />
+                    <TextBox x:Name="ShapeHeightBox"
+                             TextChanged="OnShapeHeightChanged" />
+                </StackPanel>
+            </Grid>
+
+            <TextBlock Style="{StaticResource FieldLabelStyle}"
+                       Text="線の太さ (px)" />
+            <TextBox x:Name="StrokeWidthBox"
+                     TextChanged="OnStrokeWidthChanged" />
+
+            <TextBlock Style="{StaticResource FieldLabelStyle}"
+                       Text="線の種類" />
+            <StackPanel Orientation="Horizontal">
+                <RadioButton x:Name="SolidRadio"
+                             Margin="0,0,14,0"
+                             Content="実線"
+                             GroupName="ShapeDash"
+                             Click="OnDashClick" />
+                <RadioButton x:Name="DashedRadio"
+                             Margin="0,0,14,0"
+                             Content="破線"
+                             GroupName="ShapeDash"
+                             Click="OnDashClick" />
+                <RadioButton x:Name="DottedRadio"
+                             Content="点線"
+                             GroupName="ShapeDash"
+                             Click="OnDashClick" />
+            </StackPanel>
+
+            <StackPanel x:Name="RadiusSection">
+                <TextBlock Style="{StaticResource FieldLabelStyle}"
+                           Text="角の丸み (px)" />
+                <TextBox x:Name="CornerRadiusBox"
+                         TextChanged="OnCornerRadiusChanged" />
+            </StackPanel>
+
+            <TextBlock Style="{StaticResource FieldLabelStyle}"
+                       Text="線の色" />
+            <ui:ColorField x:Name="StrokeColorField"
+                           ColorChanged="OnStrokeColorChanged"
+                           EditCompleted="OnColorEditCompleted" />
+
+            <StackPanel x:Name="FillSection">
+                <TextBlock Style="{StaticResource FieldLabelStyle}"
+                           Text="塗りつぶし" />
+                <ui:ColorField x:Name="FillColorField"
+                               ShowNoneButton="True"
+                               ColorChanged="OnFillColorChanged"
+                               EditCompleted="OnColorEditCompleted" />
+            </StackPanel>
+        </StackPanel>
+    </StackPanel>
+    </Grid>
+</UserControl>

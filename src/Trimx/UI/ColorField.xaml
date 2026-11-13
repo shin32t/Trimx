@@ -1,0 +1,37 @@
+<UserControl x:Class="Trimx.UI.ColorField"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <StackPanel>
+        <DockPanel>
+            <Border x:Name="Swatch"
+                    DockPanel.Dock="Left"
+                    Width="24"
+                    Height="24"
+                    Margin="0,0,6,0"
+                    BorderBrush="{DynamicResource BorderBrush}"
+                    BorderThickness="1" />
+            <Button x:Name="PickerButton"
+                    DockPanel.Dock="Right"
+                    Margin="6,0,0,0"
+                    Padding="8,2"
+                    Content="…"
+                    ToolTip="カラーピッカーで選ぶ"
+                    Click="OnPickerClick" />
+            <Button x:Name="NoneButton"
+                    DockPanel.Dock="Right"
+                    Margin="6,0,0,0"
+                    Padding="8,2"
+                    Content="なし"
+                    ToolTip="透明にする"
+                    Visibility="Collapsed"
+                    Click="OnNoneClick" />
+            <TextBox x:Name="HexBox"
+                     VerticalContentAlignment="Center"
+                     ToolTip="#RRGGBB または #AARRGGBB"
+                     TextChanged="OnHexTextChanged"
+                     LostFocus="OnHexLostFocus" />
+        </DockPanel>
+        <WrapPanel x:Name="Presets"
+                   Margin="0,5,0,0" />
+    </StackPanel>
+</UserControl>

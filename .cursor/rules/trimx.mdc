@@ -1,0 +1,19 @@
+---
+description: Trimx project-wide rules (shared context lives in .ai/)
+alwaysApply: true
+---
+
+# Trimx
+
+A lightweight image editor for Windows 11 (C# / .NET 10 / WPF / SkiaSharp).
+
+Shared context lives in `.ai/`. Read it before working. Do not add content to this file; update `.ai/` instead.
+
+- @.ai/project.md
+- @.ai/architecture.md
+- @.ai/conventions.md
+- @.ai/pitfalls.md
+
+For per-feature implementation details, read `.ai/implementation-notes.md` when touching that feature (it is not attached by default).
+
+The primary source for requirements is `docs/plan.md` (Japanese). Respond to the maintainer in Japanese, confirm the build with `dotnet build Trimx.slnx` after changes, and do not add features that are not in plan.md.

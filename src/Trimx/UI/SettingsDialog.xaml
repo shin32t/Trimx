@@ -1,0 +1,77 @@
+<Window x:Class="Trimx.UI.SettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="設定"
+        SizeToContent="WidthAndHeight"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource PanelBackgroundBrush}"
+        Foreground="{DynamicResource ForegroundBrush}">
+    <StackPanel Margin="20"
+                MinWidth="320">
+        <TextBlock FontWeight="SemiBold"
+                   Text="テーマ" />
+        <RadioButton x:Name="SystemRadio"
+                     Margin="0,8,0,0"
+                     GroupName="Theme"
+                     Content="システムの設定に合わせる"
+                     Checked="OnThemeChecked" />
+        <RadioButton x:Name="DarkRadio"
+                     Margin="0,6,0,0"
+                     GroupName="Theme"
+                     Content="ダーク"
+                     Checked="OnThemeChecked" />
+        <RadioButton x:Name="LightRadio"
+                     Margin="0,6,0,0"
+                     GroupName="Theme"
+                     Content="ライト"
+                     Checked="OnThemeChecked" />
+
+        <TextBlock Margin="0,18,0,0"
+                   FontWeight="SemiBold"
+                   Text="ツールバー" />
+        <CheckBox x:Name="LabelsCheck"
+                  Margin="0,8,0,0"
+                  Content="ボタンにラベルを表示する"
+                  Click="OnLabelsClick" />
+
+        <TextBlock Margin="0,18,0,0"
+                   FontWeight="SemiBold"
+                   Text="テキスト" />
+        <TextBlock Margin="0,8,0,0"
+                   Text="新しいテキストの初期文字列" />
+        <TextBox x:Name="DefaultTextBox"
+                 Margin="0,4,0,0"
+                 TextChanged="OnDefaultTextChanged" />
+
+        <TextBlock Margin="0,18,0,0"
+                   FontWeight="SemiBold"
+                   Text="描画" />
+        <TextBlock Margin="0,6,0,0"
+                   TextWrapping="Wrap"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   Text="ペン・テキスト・図形は、前回使った色や太さなどを引き継ぎます。" />
+        <Button Margin="0,8,0,0"
+                HorizontalAlignment="Left"
+                Content="描画の設定をデフォルトに戻す"
+                Click="OnResetDrawingClick" />
+
+        <Border Margin="0,20,0,0"
+                Padding="0,12,0,0"
+                BorderBrush="{DynamicResource BorderBrush}"
+                BorderThickness="0,1,0,0">
+            <DockPanel>
+                <Button MinWidth="80"
+                        Margin="12,0,0,0"
+                        DockPanel.Dock="Right"
+                        IsDefault="True"
+                        IsCancel="True"
+                        Content="閉じる" />
+                <TextBlock x:Name="CopyrightText"
+                           VerticalAlignment="Center"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}" />
+            </DockPanel>
+        </Border>
+    </StackPanel>
+</Window>

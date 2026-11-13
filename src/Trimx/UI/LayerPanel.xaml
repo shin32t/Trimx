@@ -1,0 +1,228 @@
+<UserControl x:Class="Trimx.UI.LayerPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ui="clr-namespace:Trimx.UI"
+             Background="{DynamicResource PanelBackgroundBrush}"
+             Foreground="{DynamicResource ForegroundBrush}">
+    <UserControl.Resources>
+        <ui:LayerKindConverter x:Key="LayerKindConverter" />
+
+        <!-- Visibility toggle drawn as an eye (slashed when hidden). It stays a CheckBox so IsChecked and Click work as before. -->
+        <Style x:Key="EyeCheckBoxStyle"
+               TargetType="CheckBox">
+            <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="Bd"
+                                Width="26"
+                                Height="26"
+                                Background="Transparent"
+                                CornerRadius="4">
+                            <TextBlock x:Name="Glyph"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Symbol"
+                                       FontSize="15"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       Text="&#xED1A;" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked" Value="True">
+                                <Setter TargetName="Glyph" Property="Text" Value="&#xE7B3;" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource HoverBrush}" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Small icon-only button. The glyph comes from Tag; Content only names it for accessibility. -->
+        <Style x:Key="LayerIconButtonStyle"
+               TargetType="Button">
+            <Setter Property="Foreground" Value="{DynamicResource ForegroundBrush}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Margin" Value="1,0" />
+            <Setter Property="ToolTipService.ShowOnDisabled" Value="True" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Bd"
+                                Padding="0,5"
+                                Background="{TemplateBinding Background}"
+                                CornerRadius="4">
+                            <TextBlock HorizontalAlignment="Center"
+                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Symbol"
+                                       FontSize="14"
+                                       Foreground="{TemplateBinding Foreground}"
+                                       Text="{TemplateBinding Tag}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource HoverBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Bd" Property="Background" Value="{DynamicResource PressedBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Opacity" Value="0.35" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <DockPanel>
+        <TextBlock DockPanel.Dock="Top"
+                   Margin="10,8,10,4"
+                   Foreground="{DynamicResource SecondaryForegroundBrush}"
+                   Text="レイヤー" />
+
+        <StackPanel DockPanel.Dock="Bottom"
+                    Margin="10,6,10,10">
+            <DockPanel Margin="0,0,0,2">
+                <TextBlock x:Name="OpacityText"
+                           DockPanel.Dock="Right"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                <TextBlock Text="不透明度" />
+            </DockPanel>
+            <Slider x:Name="OpacitySlider"
+                    Minimum="0"
+                    Maximum="1"
+                    SmallChange="0.01"
+                    LargeChange="0.1"
+                    IsEnabled="False"
+                    ValueChanged="OnOpacityChanged"
+                    PreviewMouseLeftButtonUp="OnOpacityEditEnded"
+                    LostKeyboardFocus="OnOpacityEditEnded" />
+            <!-- Icon-only buttons (the tooltip names them) to save space. -->
+            <UniformGrid Margin="0,8,0,0"
+                         Columns="6">
+                <Button x:Name="AddButton"
+                        Style="{StaticResource LayerIconButtonStyle}"
+                        Tag="&#xE710;"
+                        Content="新規"
+                        ToolTip="空のレイヤーを追加"
+                        Click="OnAddEmpty" />
+                <Button x:Name="DuplicateButton"
+                        Style="{StaticResource LayerIconButtonStyle}"
+                        Tag="&#xE8C8;"
+                        Content="複製"
+                        ToolTip="レイヤーを複製"
+                        Click="OnDuplicate" />
+                <Button x:Name="MergeButton"
+                        Style="{StaticResource LayerIconButtonStyle}"
+                        Tag="&#xEA3C;"
+                        Content="結合"
+                        ToolTip="下のレイヤーと結合 (どちらも表示中のレイヤーのみ)"
+                        Click="OnMergeDown" />
+                <Button x:Name="MoveUpButton"
+                        Style="{StaticResource LayerIconButtonStyle}"
+                        Tag="&#xE74A;"
+                        Content="上へ"
+                        ToolTip="レイヤーを上へ移動 (一覧でドラッグしても並べ替えできます)"
+                        Click="OnMoveUp" />
+                <Button x:Name="MoveDownButton"
+                        Style="{StaticResource LayerIconButtonStyle}"
+                        Tag="&#xE74B;"
+                        Content="下へ"
+                        ToolTip="レイヤーを下へ移動"
+                        Click="OnMoveDown" />
+                <Button x:Name="DeleteButton"
+                        Style="{StaticResource LayerIconButtonStyle}"
+                        Tag="&#xE74D;"
+                        Content="削除"
+                        ToolTip="レイヤーを削除 (Delete)"
+                        Click="OnDelete" />
+            </UniformGrid>
+        </StackPanel>
+
+        <!-- Items are shown top layer first, like Photoshop. -->
+        <Grid>
+            <ListBox x:Name="LayerList"
+                     Style="{StaticResource LayerListStyle}"
+                     AllowDrop="True"
+                     PreviewMouseLeftButtonDown="OnListPreviewMouseDown"
+                     PreviewMouseRightButtonDown="OnListPreviewRightMouseDown"
+                     ContextMenuOpening="OnContextMenuOpening"
+                     PreviewMouseMove="OnListPreviewMouseMove"
+                     DragOver="OnListDragOver"
+                     DragLeave="OnListDragLeave"
+                     Drop="OnListDrop"
+                     SelectionChanged="OnLayerListSelectionChanged">
+                <ListBox.ContextMenu>
+                    <ContextMenu Background="{DynamicResource PanelBackgroundBrush}"
+                                 BorderBrush="{DynamicResource BorderBrush}"
+                                 Foreground="{DynamicResource ForegroundBrush}">
+                        <MenuItem x:Name="RasterizeMenuItem"
+                                  Header="画像レイヤーにラスタライズ"
+                                  ToolTip="変換後はテキストや図形として編集できなくなります (元に戻せます)"
+                                  Click="OnRasterize" />
+                        <MenuItem x:Name="MergeMenuItem"
+                                  Header="下のレイヤーと結合"
+                                  Click="OnMergeDown" />
+                    </ContextMenu>
+                </ListBox.ContextMenu>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid x:Name="Row">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox Grid.Column="0"
+                                      Style="{StaticResource EyeCheckBoxStyle}"
+                                      VerticalAlignment="Center"
+                                      IsChecked="{Binding Layer.IsVisible, Mode=OneWay}"
+                                      ToolTip="表示 / 非表示"
+                                      Click="OnVisibilityClick" />
+                            <Border Grid.Column="1"
+                                    Width="36"
+                                    Height="36"
+                                    Margin="8,0,0,0"
+                                    Background="{StaticResource CheckerBrush}"
+                                    BorderBrush="{DynamicResource BorderBrush}"
+                                    BorderThickness="1">
+                                <Image Source="{Binding Thumbnail}"
+                                       RenderOptions.BitmapScalingMode="HighQuality"
+                                       Stretch="Uniform" />
+                            </Border>
+                            <StackPanel Grid.Column="2"
+                                        Margin="8,0,0,0"
+                                        VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Layer.Name}"
+                                           TextTrimming="CharacterEllipsis" />
+                                <TextBlock FontSize="11"
+                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                                           Text="{Binding Layer, Converter={StaticResource LayerKindConverter}}" />
+                            </StackPanel>
+                        </Grid>
+                        <DataTemplate.Triggers>
+                            <!-- Hidden layers are dimmed -->
+                            <DataTrigger Binding="{Binding Layer.IsVisible}"
+                                         Value="False">
+                                <Setter TargetName="Row" Property="Opacity" Value="0.5" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
+            </ListBox>
+
+            <!-- Shows where a dragged layer will land -->
+            <Border x:Name="DropIndicator"
+                    Height="2"
+                    VerticalAlignment="Top"
+                    Background="{DynamicResource AccentBrush}"
+                    IsHitTestVisible="False"
+                    Visibility="Collapsed" />
+        </Grid>
+    </DockPanel>
+</UserControl>
