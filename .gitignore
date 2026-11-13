@@ -33,3 +33,6 @@ CLAUDE.local.md
 
 # Installer build output
 installer/output/
+
+# WPF build temp project
+*_wpftmp.csproj
