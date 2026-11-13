@@ -1,0 +1,12 @@
+# Text files are stored as LF in the repository and checked out as CRLF on every machine.
+* text=auto eol=crlf
+
+# Binary files: never convert or diff as text.
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.webp binary
+*.ico binary
+*.bmp binary
+*.zip binary
+*.trimx binary

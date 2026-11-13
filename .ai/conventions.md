@@ -10,6 +10,7 @@
 
 Follow the Microsoft C# coding conventions (not strictly).
 
+- Line endings are CRLF in the working tree (`.gitattributes` / `.editorconfig`); Git stores LF. If a tool writes LF, that is fine: Git normalizes it on commit.
 - Indent with 4 spaces. Use Allman braces.
 - `PascalCase` for types, methods, properties, and public members. `camelCase` for locals and parameters.
 - Private fields are `_camelCase`, interfaces start with `I`, async methods end with `Async`.
