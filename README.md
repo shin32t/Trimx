@@ -4,6 +4,8 @@
 
 English | [日本語](README.ja.md)
 
+Website: <https://urashiba.net/products/trimx/>
+
 A lightweight image editor for Windows 11. It is built for one workflow: take a screenshot with `Win + Shift + S`, then quickly edit, annotate, and export the image from the clipboard.
 
 Trimx has no screen-capture feature of its own. It relies on the built-in Windows tool.

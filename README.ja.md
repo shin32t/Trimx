@@ -2,6 +2,8 @@
 
 [English](README.md) | 日本語
 
+Web サイト: <https://urashiba.net/products/trimx/>
+
 Windows 11 向けの軽量画像編集アプリ。`Win + Shift + S` でスクリーンショットを撮ったあと、クリップボードの画像をすぐに編集・加工・出力することに特化しています。
 
 画面キャプチャ機能は持ちません（Windows 標準機能を利用します）。
