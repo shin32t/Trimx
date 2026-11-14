@@ -70,29 +70,29 @@ public static class LayerCommands
         return Property(layer, nameof(TextLayer.IsItalic), static l => l.IsItalic, static (l, v) => l.IsItalic = v, isItalic);
     }
 
-    public static IDocumentCommand SetHasShadow(TextLayer layer, bool hasShadow)
+    public static IDocumentCommand SetHasShadow<TLayer>(TLayer layer, bool hasShadow) where TLayer : Layer, IShadowed
     {
-        return Property(layer, nameof(TextLayer.HasShadow), static l => l.HasShadow, static (l, v) => l.HasShadow = v, hasShadow);
+        return Property(layer, nameof(IShadowed.HasShadow), static l => l.HasShadow, static (l, v) => l.HasShadow = v, hasShadow);
     }
 
-    public static IDocumentCommand SetShadowBlur(TextLayer layer, float blur)
+    public static IDocumentCommand SetShadowBlur<TLayer>(TLayer layer, float blur) where TLayer : Layer, IShadowed
     {
-        return Property(layer, nameof(TextLayer.ShadowBlur), static l => l.ShadowBlur, static (l, v) => l.ShadowBlur = v, blur);
+        return Property(layer, nameof(IShadowed.ShadowBlur), static l => l.ShadowBlur, static (l, v) => l.ShadowBlur = v, blur);
     }
 
-    public static IDocumentCommand SetShadowOpacity(TextLayer layer, float opacity)
+    public static IDocumentCommand SetShadowOpacity<TLayer>(TLayer layer, float opacity) where TLayer : Layer, IShadowed
     {
-        return Property(layer, nameof(TextLayer.ShadowOpacity), static l => l.ShadowOpacity, static (l, v) => l.ShadowOpacity = v, opacity);
+        return Property(layer, nameof(IShadowed.ShadowOpacity), static l => l.ShadowOpacity, static (l, v) => l.ShadowOpacity = v, opacity);
     }
 
-    public static IDocumentCommand SetShadowOffsetX(TextLayer layer, float offset)
+    public static IDocumentCommand SetShadowOffsetX<TLayer>(TLayer layer, float offset) where TLayer : Layer, IShadowed
     {
-        return Property(layer, nameof(TextLayer.ShadowOffsetX), static l => l.ShadowOffsetX, static (l, v) => l.ShadowOffsetX = v, offset);
+        return Property(layer, nameof(IShadowed.ShadowOffsetX), static l => l.ShadowOffsetX, static (l, v) => l.ShadowOffsetX = v, offset);
     }
 
-    public static IDocumentCommand SetShadowOffsetY(TextLayer layer, float offset)
+    public static IDocumentCommand SetShadowOffsetY<TLayer>(TLayer layer, float offset) where TLayer : Layer, IShadowed
     {
-        return Property(layer, nameof(TextLayer.ShadowOffsetY), static l => l.ShadowOffsetY, static (l, v) => l.ShadowOffsetY = v, offset);
+        return Property(layer, nameof(IShadowed.ShadowOffsetY), static l => l.ShadowOffsetY, static (l, v) => l.ShadowOffsetY = v, offset);
     }
 
     public static IDocumentCommand SetOutlineWidth(TextLayer layer, float width)

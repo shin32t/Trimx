@@ -78,17 +78,7 @@ public static class LayerRenderer
                 box.Inflate(textLayer.OutlineWidth, textLayer.OutlineWidth);
 
                 // The shadow is part of the text's footprint, so selection and rasterizing include it.
-                if (HasVisibleShadow(textLayer))
-                {
-                    var shadow = box;
-                    shadow.Offset(textLayer.ShadowOffsetX, textLayer.ShadowOffsetY);
-
-                    // A Gaussian blur fades out over about three sigma (sigma = blur / 2).
-                    shadow.Inflate(textLayer.ShadowBlur * 1.5f, textLayer.ShadowBlur * 1.5f);
-                    box = SKRect.Union(box, shadow);
-                }
-
-                return box;
+                return WithShadow(box, textLayer);
             }
 
             case ShapeLayer shapeLayer:
@@ -101,7 +91,7 @@ public static class LayerRenderer
                 }
 
                 rect.Inflate(inflate, inflate);
-                return rect;
+                return WithShadow(rect, shapeLayer);
             }
 
             default:
@@ -146,7 +136,26 @@ public static class LayerRenderer
         canvas.DrawPath(path, paint);
     }
 
-    private static bool HasVisibleShadow(TextLayer layer) => layer.HasShadow && layer.ShadowOpacity > 0f;
+    private static bool HasVisibleShadow(IShadowed layer) => layer.HasShadow && layer.ShadowOpacity > 0f;
+
+    /// <summary>The box extended to cover the layer's shadow, if it has a visible one.</summary>
+    private static SKRect WithShadow(SKRect box, IShadowed layer)
+    {
+        if (!HasVisibleShadow(layer))
+        {
+            return box;
+        }
+
+        var shadow = box;
+        shadow.Offset(layer.ShadowOffsetX, layer.ShadowOffsetY);
+
+        // A Gaussian blur fades out over about three sigma (sigma = blur / 2).
+        shadow.Inflate(layer.ShadowBlur * 1.5f, layer.ShadowBlur * 1.5f);
+        return SKRect.Union(box, shadow);
+    }
+
+    // The silhouette of a shadow: black, keeping each color's own transparency (an unfilled shape casts no fill shadow).
+    private static SKColor Tint(SKColor color, bool shadow) => shadow ? SKColors.Black.WithAlpha(color.Alpha) : color;
 
     private static void DrawText(TextLayer layer, SKCanvas canvas)
     {
@@ -223,17 +232,38 @@ public static class LayerRenderer
 
     private static void DrawShape(ShapeLayer layer, SKCanvas canvas)
     {
+        if (HasVisibleShadow(layer))
+        {
+            // Same method as text: the silhouette is drawn opaque into an offscreen layer, then blurred and faded
+            // as a whole, so the fill and the outline do not add up their darkness where they overlap.
+            using var blur = layer.ShadowBlur > 0f ? SKImageFilter.CreateBlur(layer.ShadowBlur / 2f, layer.ShadowBlur / 2f) : null;
+            using var layerPaint = new SKPaint
+            {
+                Color = SKColors.Black.WithAlpha((byte)MathF.Round(layer.ShadowOpacity * 255f)),
+                ImageFilter = blur,
+            };
+            canvas.SaveLayer(layerPaint);
+            canvas.Translate(layer.ShadowOffsetX, layer.ShadowOffsetY);
+            DrawShapeBody(layer, canvas, shadow: true);
+            canvas.Restore();
+        }
+
+        DrawShapeBody(layer, canvas, shadow: false);
+    }
+
+    private static void DrawShapeBody(ShapeLayer layer, SKCanvas canvas, bool shadow)
+    {
         using var paint = new SKPaint { IsAntialias = true };
 
         if (layer.Kind == ShapeKind.Arrow)
         {
-            DrawArrow(layer, canvas, paint);
+            DrawArrow(layer, canvas, paint, shadow);
             return;
         }
 
         if (layer.Kind == ShapeKind.Line)
         {
-            DrawLine(layer, canvas, paint);
+            DrawLine(layer, canvas, paint, shadow);
             return;
         }
 
@@ -242,7 +272,7 @@ public static class LayerRenderer
         if (layer.FillColor.Alpha > 0)
         {
             paint.Style = SKPaintStyle.Fill;
-            paint.Color = layer.FillColor;
+            paint.Color = Tint(layer.FillColor, shadow);
             DrawBox(layer, canvas, rect, paint);
         }
 
@@ -250,7 +280,7 @@ public static class LayerRenderer
         {
             paint.Style = SKPaintStyle.Stroke;
             paint.StrokeWidth = layer.StrokeWidth;
-            paint.Color = layer.StrokeColor;
+            paint.Color = Tint(layer.StrokeColor, shadow);
             using var dash = ApplyDash(paint, layer.Dash, layer.StrokeWidth);
             DrawBox(layer, canvas, rect, paint);
         }
@@ -298,7 +328,7 @@ public static class LayerRenderer
         return effect;
     }
 
-    private static void DrawLine(ShapeLayer layer, SKCanvas canvas, SKPaint paint)
+    private static void DrawLine(ShapeLayer layer, SKCanvas canvas, SKPaint paint, bool shadow)
     {
         if (layer.StrokeWidth <= 0f || layer.StrokeColor.Alpha == 0)
         {
@@ -307,13 +337,13 @@ public static class LayerRenderer
 
         paint.Style = SKPaintStyle.Stroke;
         paint.StrokeWidth = layer.StrokeWidth;
-        paint.Color = layer.StrokeColor;
+        paint.Color = Tint(layer.StrokeColor, shadow);
         paint.StrokeCap = SKStrokeCap.Butt;
         using var dash = ApplyDash(paint, layer.Dash, layer.StrokeWidth);
         canvas.DrawLine(layer.X, layer.Y, layer.X + layer.Width, layer.Y + layer.Height, paint);
     }
 
-    private static void DrawArrow(ShapeLayer layer, SKCanvas canvas, SKPaint paint)
+    private static void DrawArrow(ShapeLayer layer, SKCanvas canvas, SKPaint paint, bool shadow)
     {
         var start = new SKPoint(layer.X, layer.Y);
         var end = new SKPoint(layer.X + layer.Width, layer.Y + layer.Height);
@@ -329,7 +359,7 @@ public static class LayerRenderer
         var headHalfWidth = headLength * ArrowHeadWidthRatio;
         var headBase = new SKPoint(end.X - direction.X * headLength, end.Y - direction.Y * headLength);
 
-        paint.Color = layer.StrokeColor;
+        paint.Color = Tint(layer.StrokeColor, shadow);
 
         // End the shaft inside the head so the butt cap is hidden under the triangle.
         var shaftEnd = new SKPoint(end.X - direction.X * headLength * 0.5f, end.Y - direction.Y * headLength * 0.5f);

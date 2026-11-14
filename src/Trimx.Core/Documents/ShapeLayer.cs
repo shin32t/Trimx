@@ -10,7 +10,7 @@ namespace Trimx.Core.Documents;
 /// For <see cref="ShapeKind.Arrow"/> the arrow runs from (X, Y) to (X + Width, Y + Height),
 /// so Width and Height may be negative to express direction.
 /// </remarks>
-public sealed class ShapeLayer : Layer
+public sealed class ShapeLayer : Layer, IShadowed
 {
     private ShapeKind _kind;
     private int _width;
@@ -20,6 +20,11 @@ public sealed class ShapeLayer : Layer
     private SKColor _fillColor = SKColors.Transparent;
     private ShapeDash _dash;
     private float _cornerRadius;
+    private bool _hasShadow;
+    private float _shadowOpacity = IShadowed.DefaultOpacity;
+    private float _shadowBlur = IShadowed.DefaultBlur;
+    private float _shadowOffsetX = IShadowed.DefaultOffset;
+    private float _shadowOffsetY = IShadowed.DefaultOffset;
 
     public override Layer Clone()
     {
@@ -33,6 +38,11 @@ public sealed class ShapeLayer : Layer
             _fillColor = _fillColor,
             _dash = _dash,
             _cornerRadius = _cornerRadius,
+            _hasShadow = _hasShadow,
+            _shadowOpacity = _shadowOpacity,
+            _shadowBlur = _shadowBlur,
+            _shadowOffsetX = _shadowOffsetX,
+            _shadowOffsetY = _shadowOffsetY,
         });
     }
 
@@ -86,5 +96,36 @@ public sealed class ShapeLayer : Layer
     {
         get => _cornerRadius;
         set => SetField(ref _cornerRadius, Math.Max(0f, value));
+    }
+
+    /// <summary>Whether the drop shadow is drawn. The shadow follows the drawn outline and fill (an unfilled shape casts a ring).</summary>
+    public bool HasShadow
+    {
+        get => _hasShadow;
+        set => SetField(ref _hasShadow, value);
+    }
+
+    public float ShadowOpacity
+    {
+        get => _shadowOpacity;
+        set => SetField(ref _shadowOpacity, Math.Clamp(value, 0f, 1f));
+    }
+
+    public float ShadowBlur
+    {
+        get => _shadowBlur;
+        set => SetField(ref _shadowBlur, Math.Max(0f, value));
+    }
+
+    public float ShadowOffsetX
+    {
+        get => _shadowOffsetX;
+        set => SetField(ref _shadowOffsetX, value);
+    }
+
+    public float ShadowOffsetY
+    {
+        get => _shadowOffsetY;
+        set => SetField(ref _shadowOffsetY, value);
     }
 }

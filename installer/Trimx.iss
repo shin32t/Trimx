@@ -5,7 +5,7 @@
 ; "for all users" on the first page. The publish output already contains the .NET runtime.
 
 #ifndef AppVersion
-  #define AppVersion "0.1.0"
+  #define AppVersion "0.2.0"
 #endif
 
 #define AppName "Trimx"

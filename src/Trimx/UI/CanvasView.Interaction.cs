@@ -162,7 +162,9 @@ public partial class CanvasView
 
             case DragMode.ResizeShape when _dragLayer is ShapeLayer shape:
             {
-                var geometry = ShapeHandles.Drag(shape.Kind, _dragGeometry, _dragHandle, ToDocument(_tab, position));
+                // Shift snaps a line or an arrow to multiples of 45 degrees (boxes ignore it).
+                var snap = (Keyboard.Modifiers & ModifierKeys.Shift) != 0;
+                var geometry = ShapeHandles.Drag(shape.Kind, _dragGeometry, _dragHandle, ToDocument(_tab, position), snap);
                 if (geometry != ShapeGeometry.From(shape))
                 {
                     _tab.Execute(LayerCommands.SetShapeGeometry(shape, geometry), merge: true);

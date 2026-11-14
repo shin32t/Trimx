@@ -3,20 +3,27 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
     <StackPanel>
         <DockPanel>
+            <!-- The swatch is the button that opens the color picker. The hand cursor and the highlighted border show it can be pressed. -->
             <Border x:Name="Swatch"
                     DockPanel.Dock="Left"
-                    Width="24"
+                    Width="28"
                     Height="24"
                     Margin="0,0,6,0"
-                    BorderBrush="{DynamicResource BorderBrush}"
-                    BorderThickness="1" />
-            <Button x:Name="PickerButton"
-                    DockPanel.Dock="Right"
-                    Margin="6,0,0,0"
-                    Padding="8,2"
-                    Content="…"
-                    ToolTip="カラーピッカーで選ぶ"
-                    Click="OnPickerClick" />
+                    BorderThickness="1"
+                    Cursor="Hand"
+                    ToolTip="クリックでカラーピッカーを開く"
+                    MouseLeftButtonUp="OnSwatchClick">
+                <Border.Style>
+                    <Style TargetType="Border">
+                        <Setter Property="BorderBrush" Value="{DynamicResource BorderBrush}" />
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}" />
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Border.Style>
+            </Border>
             <Button x:Name="NoneButton"
                     DockPanel.Dock="Right"
                     Margin="6,0,0,0"
