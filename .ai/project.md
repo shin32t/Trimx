@@ -38,7 +38,7 @@ Always confirm the build passes after making changes.
 ## Implementation status
 
 - Phases 1-4 are implemented: image display and zoom, tabs, layers (image / text / shape), Undo / Redo, text and shape editing, pen, rectangular selection and crop, canvas / image resize, project save (`.trimx`), PNG / JPEG / WebP export, clipboard copy, open files and drag and drop, theme and settings.
-- Not implemented: single-instance behavior and optimization (Phase 5); BMP export (under consideration).
+- Phase 5 in progress: single-instance behavior is implemented. Not implemented: startup measurement and the other optimizations (Phase 5); BMP export (under consideration).
 - Real-screen verification is partial. Build, startup, Core behavior, and button operations are verified; mouse and keyboard interactions are not.
 
 ## Data files (`%LOCALAPPDATA%\Trimx\`)

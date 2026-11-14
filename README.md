@@ -106,7 +106,7 @@ Trimx creates two files in `%LOCALAPPDATA%\Trimx\`:
 | Phase 2 | Document, tabs, layers | Done |
 | Phase 3 | Editing, Undo / Redo | Done |
 | Phase 4 | Save, export, copy | Done |
-| Phase 5 | Single instance, optimization | Not started |
+| Phase 5 | Single instance, optimization | In progress (single instance done) |
 
 Mouse and keyboard interactions have only been partly verified on a real screen. Build, startup, Core behavior, button operations, and confirmation dialogs have been verified.
 

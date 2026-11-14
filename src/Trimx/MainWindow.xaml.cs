@@ -14,6 +14,7 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<DocumentTab> _tabs = new();
     private int _clipboardTabCount;
     private int _untitledTabCount;
+    private bool _firstContentRendered;
 
     public MainWindow()
     {
@@ -34,8 +35,32 @@ public partial class MainWindow : Window
     private void OnFirstContentRendered(object? sender, EventArgs e)
     {
         ContentRendered -= OnFirstContentRendered;
+        _firstContentRendered = true;
         Canvas.Focus();
         OpenClipboardImageInNewTab();
+    }
+
+    /// <summary>
+    /// Called when the user starts Trimx again while it is running: brings this window forward and,
+    /// if the clipboard has an image, opens it in a new tab (plan.md 3.3).
+    /// </summary>
+    public void ActivateFromAnotherInstance()
+    {
+        if (WindowState == WindowState.Minimized)
+        {
+            WindowState = WindowState.Normal;
+        }
+
+        Activate();
+        // Windows can refuse to give focus to a background app; toggling Topmost still raises the window.
+        Topmost = true;
+        Topmost = false;
+
+        // Before the first render the startup path loads the clipboard itself; doing it here too would add a duplicate tab.
+        if (_firstContentRendered)
+        {
+            OpenClipboardImageInNewTab();
+        }
     }
 
     protected override void OnClosing(CancelEventArgs e)
