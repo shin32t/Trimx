@@ -320,6 +320,27 @@
                             Content="設定"
                             ToolTip="設定: テーマ・ツールバーの表示など"
                             Click="OnSettingsClick" />
+                    <!-- Shown when a newer version exists (or in debug mode); see MainWindow.Update.cs. -->
+                    <Button x:Name="UpdateButton"
+                            Margin="8,0,0,0"
+                            Padding="12,0"
+                            VerticalAlignment="Center"
+                            Height="28"
+                            Visibility="Collapsed"
+                            Background="{DynamicResource AccentBrush}"
+                            Foreground="White"
+                            BorderThickness="0"
+                            Click="OnUpdateClick">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock VerticalAlignment="Center"
+                                       FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets, Segoe UI Symbol"
+                                       FontSize="14"
+                                       Text="&#xE896;" />
+                            <TextBlock Margin="6,0,0,0"
+                                       VerticalAlignment="Center"
+                                       Text="更新" />
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </Grid>
         </Border>

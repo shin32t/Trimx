@@ -9,6 +9,13 @@ public partial class App : Application
 
     protected override void OnStartup(StartupEventArgs e)
     {
+        // Started by the old version to swap the files: do that and nothing else (no window, no single-instance check).
+        if (UpdateService.TryRunApplier(e.Args))
+        {
+            Shutdown();
+            return;
+        }
+
         // First thing, so a second launch exits quickly without loading anything.
         _singleInstance = SingleInstanceService.TryBecomePrimary();
         if (_singleInstance is null)
@@ -18,6 +25,7 @@ public partial class App : Application
             return;
         }
 
+        DebugMode.Initialize(e.Args);
         _singleInstance.SecondInstanceStarted += () => Dispatcher.BeginInvoke(OnSecondInstanceStarted);
 
         // Before the main window exists, so it never flashes the wrong palette.
