@@ -3,7 +3,7 @@ name: Release
 # How to release:
 #   1. Set <Version> in src/Trimx/Trimx.csproj (e.g. 0.2.0) and merge it to main.
 #   2. git tag v0.2.0 ; git push origin v0.2.0
-#   3. A DRAFT release is created with the installer and the zip. Check it on the Releases page, then Publish.
+#   3. A DRAFT release is created with the installer and the zip (each also attached without the version in its name). Check it on the Releases page, then Publish.
 #
 # To test the build without creating a release, run this workflow by hand from the Actions tab
 # ("Run workflow"). The files are then attached to the run as an artifact instead.
@@ -85,10 +85,18 @@ jobs:
           TAG: ${{ github.ref_name }}
           VERSION: ${{ steps.version.outputs.version }}
         run: |
+          # Also attach copies without the version in the name. The website links to
+          #   https://github.com/<owner>/Trimx/releases/latest/download/Trimx-win-x64-setup.exe
+          # which always points at the newest published release, so the website needs no edit per release.
+          # (The self-update only matches Trimx-*-win-x64.zip, so Trimx-win-x64.zip is not picked up by it.)
+          Copy-Item "installer\output\Trimx-$($env:VERSION)-win-x64-setup.exe" 'installer\output\Trimx-win-x64-setup.exe'
+          Copy-Item "installer\output\Trimx-$($env:VERSION)-win-x64.zip" 'installer\output\Trimx-win-x64.zip'
           # A version with a suffix such as 0.2.0-rc.1 is marked as a pre-release.
           $ghArgs = @('release', 'create', $env:TAG,
             "installer\output\Trimx-$($env:VERSION)-win-x64-setup.exe",
             "installer\output\Trimx-$($env:VERSION)-win-x64.zip",
+            'installer\output\Trimx-win-x64-setup.exe',
+            'installer\output\Trimx-win-x64.zip',
             '--draft', '--generate-notes', '--title', "Trimx $($env:VERSION)")
           if ($env:VERSION -match '-') { $ghArgs += '--prerelease' }
           gh @ghArgs
