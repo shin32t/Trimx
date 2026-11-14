@@ -21,6 +21,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         LoadPenFromState();
         LoadLayoutFromState();
+        ShowUpdateButton(updateAvailable: false);
         Canvas.PenModeChanged += OnPenModeChanged;
         Canvas.SelectModeChanged += OnSelectModeChanged;
         TabStrip.ItemsSource = _tabs;
@@ -37,7 +38,14 @@ public partial class MainWindow : Window
         ContentRendered -= OnFirstContentRendered;
         _firstContentRendered = true;
         Canvas.Focus();
-        OpenClipboardImageInNewTab();
+
+        // After an abnormal end (crash, update restart) the previous tabs come back instead of the clipboard image.
+        if (!RestoreBackup())
+        {
+            OpenClipboardImageInNewTab();
+        }
+
+        CheckForUpdateAsync();
     }
 
     /// <summary>
@@ -67,6 +75,12 @@ public partial class MainWindow : Window
     {
         base.OnClosing(e);
 
+        // Quitting for an update: the tabs are already backed up and come back after the restart.
+        if (_closingForUpdate)
+        {
+            return;
+        }
+
         // Ask for each document with unsaved changes; cancelling any one of them keeps the app open.
         foreach (var tab in _tabs.ToList())
         {
@@ -76,6 +90,10 @@ public partial class MainWindow : Window
                 return;
             }
         }
+
+        // Every tab was saved or discarded on purpose, so nothing is left to restore.
+        _backupTimer?.Stop();
+        BackupService.Clear();
     }
 
     protected override void OnClosed(EventArgs e)
@@ -463,7 +481,9 @@ public partial class MainWindow : Window
     private DocumentTab AddTab(ImageDocument document)
     {
         var tab = new DocumentTab(document);
+        tab.History.Changed += (_, _) => ScheduleBackup();
         _tabs.Add(tab);
+        ScheduleBackup();
         TabStrip.SelectedItem = tab;
         TabStrip.ScrollIntoView(tab);
         return tab;
@@ -514,5 +534,6 @@ public partial class MainWindow : Window
 
         _tabs.RemoveAt(index);
         tab.Dispose();
+        ScheduleBackup();
     }
 }

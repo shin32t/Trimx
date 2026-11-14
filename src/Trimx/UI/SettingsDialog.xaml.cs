@@ -31,19 +31,10 @@ public partial class SettingsDialog : Window
         }
 
         LabelsCheck.IsChecked = settings.ShowToolbarLabels;
+        AutoUpdateCheck.IsChecked = settings.AutoUpdate;
         DefaultTextBox.Text = settings.DefaultTextLabel;
-        CopyrightText.Text = $"Trimx {GetVersion()}  ©  2026 shin32t";
+        CopyrightText.Text = $"Trimx {AppVersion.Text}  ©  2026 shin32t";
         _isLoading = false;
-    }
-
-    // Version comes from <Version> in Trimx.csproj. The build metadata after '+' (commit hash) is dropped.
-    private static string GetVersion()
-    {
-        var info = typeof(SettingsDialog).Assembly
-            .GetCustomAttributes(typeof(System.Reflection.AssemblyInformationalVersionAttribute), false)
-            .OfType<System.Reflection.AssemblyInformationalVersionAttribute>()
-            .FirstOrDefault()?.InformationalVersion;
-        return info?.Split('+')[0] ?? "";
     }
 
     private void OnThemeChecked(object sender, RoutedEventArgs e)
@@ -85,6 +76,13 @@ public partial class SettingsDialog : Window
 
         var settings = SettingsService.Load();
         settings.DefaultTextLabel = DefaultTextBox.Text;
+        SettingsService.Save(settings);
+    }
+
+    private void OnAutoUpdateClick(object sender, RoutedEventArgs e)
+    {
+        var settings = SettingsService.Load();
+        settings.AutoUpdate = AutoUpdateCheck.IsChecked == true;
         SettingsService.Save(settings);
     }
 

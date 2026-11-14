@@ -45,6 +45,16 @@ public sealed class CommandHistory : IDisposable
         Changed?.Invoke(this, EventArgs.Empty);
     }
 
+    /// <summary>
+    /// Makes the document count as modified without a command, for a document restored from a backup
+    /// whose unsaved edits are in its pixels but not in this (empty) history.
+    /// </summary>
+    public void MarkModified()
+    {
+        _savePointLost = true;
+        Changed?.Invoke(this, EventArgs.Empty);
+    }
+
     /// <summary>Raised when the undo or redo availability may have changed.</summary>
     public event EventHandler? Changed;
 

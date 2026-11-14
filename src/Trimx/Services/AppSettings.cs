@@ -16,4 +16,10 @@ public sealed class AppSettings
 
     /// <summary>Whether toolbar buttons show their name under the icon.</summary>
     public bool ShowToolbarLabels { get; set; }
+
+    /// <summary>
+    /// Whether a newer version found at startup is installed at once (with a progress window) instead of
+    /// waiting for the update button to be pressed.
+    /// </summary>
+    public bool AutoUpdate { get; set; }
 }
