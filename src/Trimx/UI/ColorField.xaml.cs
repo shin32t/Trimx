@@ -138,7 +138,7 @@ public partial class ColorField : UserControl
         EditCompleted?.Invoke(this, EventArgs.Empty);
     }
 
-    private void OnPickerClick(object sender, RoutedEventArgs e)
+    private void OnSwatchClick(object sender, MouseButtonEventArgs e)
     {
         var dialog = new ColorPickerDialog(_color) { Owner = Window.GetWindow(this) };
         if (dialog.ShowDialog() != true)

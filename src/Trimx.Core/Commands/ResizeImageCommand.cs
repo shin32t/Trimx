@@ -69,6 +69,9 @@ public sealed class ResizeImageCommand : IDocumentCommand
                         steps.Add(LayerCommands.SetShapeHeight(shape, (int)Math.Round(shape.Height * scaleY)));
                         steps.Add(LayerCommands.SetStrokeWidth(shape, shape.StrokeWidth * scaleAverage));
                         steps.Add(LayerCommands.SetCornerRadius(shape, shape.CornerRadius * scaleAverage));
+                        steps.Add(LayerCommands.SetShadowBlur(shape, shape.ShadowBlur * scaleAverage));
+                        steps.Add(LayerCommands.SetShadowOffsetX(shape, shape.ShadowOffsetX * scaleAverage));
+                        steps.Add(LayerCommands.SetShadowOffsetY(shape, shape.ShadowOffsetY * scaleAverage));
                         break;
                 }
             }

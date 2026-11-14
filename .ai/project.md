@@ -28,7 +28,7 @@ Always confirm the build passes after making changes.
 
 ## Distribution (release)
 
-- The version lives only in `<Version>` in `src/Trimx/Trimx.csproj` (currently 0.1.0). The build script and the installer read it from there.
+- The version lives only in `<Version>` in `src/Trimx/Trimx.csproj` (currently 0.2.0). The build script and the installer read it from there.
 - Publishing uses `src/Trimx/Properties/PublishProfiles/Release-win-x64.pubxml`: win-x64, **self-contained (.NET runtime bundled)**, ReadyToRun, neither single-file nor trimmed (WPF does not support trimming, and a folder starts faster). Only the ja / en UI languages are kept, and debug symbols are excluded (`libSkiaSharp.pdb` is about 100 MB). Output is `src/Trimx/bin/publish/win-x64/` (about 210 MB, about 80 MB zipped).
 - `installer/build.ps1`: publish, then a portable zip (`installer/output/Trimx-<version>-win-x64.zip`), then, if Inno Setup 6 or later is installed (7 is searched first), an installer (`...-setup.exe`) from `installer/Trimx.iss`. Output goes to `installer/output/` (not tracked by git).
 - The installer is per-user by default (no admin rights). Never change the `AppId` GUID; it identifies upgrades.

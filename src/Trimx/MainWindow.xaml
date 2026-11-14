@@ -158,6 +158,7 @@
                                             Orientation="Horizontal" />
                                 <Button x:Name="PenCustomButton"
                                         Margin="0,8,0,0"
+                                        Cursor="Hand"
                                         Content="その他の色…"
                                         ToolTip="カラーピッカーで細かく色を選ぶ"
                                         Click="OnPenCustomClick" />

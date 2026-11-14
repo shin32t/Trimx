@@ -83,63 +83,6 @@
                            ColorChanged="OnTextColorChanged"
                            EditCompleted="OnColorEditCompleted" />
 
-            <CheckBox x:Name="ShadowCheck"
-                      Margin="0,12,0,0"
-                      Content="影"
-                      Click="OnShadowClick" />
-            <StackPanel x:Name="ShadowOptions"
-                        Margin="0,0,0,0">
-                <DockPanel Margin="0,8,0,0">
-                    <TextBlock x:Name="ShadowOpacityText"
-                               Width="40"
-                               DockPanel.Dock="Right"
-                               HorizontalAlignment="Right"
-                               VerticalAlignment="Center" />
-                    <TextBlock VerticalAlignment="Center"
-                               Text="濃さ"
-                               Width="48" />
-                    <Slider x:Name="ShadowOpacitySlider"
-                            Minimum="0"
-                            Maximum="100"
-                            Thumb.DragCompleted="OnSliderDragCompleted"
-                            ValueChanged="OnShadowOpacityChanged" />
-                </DockPanel>
-                <DockPanel Margin="0,4,0,0">
-                    <TextBlock x:Name="ShadowBlurText"
-                               Width="40"
-                               DockPanel.Dock="Right"
-                               HorizontalAlignment="Right"
-                               VerticalAlignment="Center" />
-                    <TextBlock VerticalAlignment="Center"
-                               Text="ぼかし"
-                               Width="48" />
-                    <Slider x:Name="ShadowBlurSlider"
-                            Minimum="0"
-                            Maximum="40"
-                            Thumb.DragCompleted="OnSliderDragCompleted"
-                            ValueChanged="OnShadowBlurChanged" />
-                </DockPanel>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="8" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <StackPanel Grid.Column="0">
-                    <TextBlock Style="{StaticResource FieldLabelStyle}"
-                               Text="影のずれ 横 (px)" />
-                    <TextBox x:Name="ShadowOffsetXBox"
-                             TextChanged="OnShadowOffsetChanged" />
-                </StackPanel>
-                <StackPanel Grid.Column="2">
-                    <TextBlock Style="{StaticResource FieldLabelStyle}"
-                               Text="縦 (px)" />
-                    <TextBox x:Name="ShadowOffsetYBox"
-                             TextChanged="OnShadowOffsetChanged" />
-                </StackPanel>
-            </Grid>
-            </StackPanel>
-
             <TextBlock Style="{StaticResource FieldLabelStyle}"
                        Text="縁取りの太さ (px、0 で縁なし)" />
             <TextBox x:Name="OutlineWidthBox"
@@ -218,6 +161,67 @@
                                ShowNoneButton="True"
                                ColorChanged="OnFillColorChanged"
                                EditCompleted="OnColorEditCompleted" />
+            </StackPanel>
+        </StackPanel>
+
+        <!-- Drop shadow: shared by text and shape layers -->
+        <StackPanel x:Name="ShadowSection"
+                    Visibility="Collapsed">
+            <CheckBox x:Name="ShadowCheck"
+                      Margin="0,12,0,0"
+                      Content="影"
+                      Click="OnShadowClick" />
+            <StackPanel x:Name="ShadowOptions"
+                        Margin="0,0,0,0">
+                <DockPanel Margin="0,8,0,0">
+                    <TextBlock x:Name="ShadowOpacityText"
+                               Width="40"
+                               DockPanel.Dock="Right"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center" />
+                    <TextBlock VerticalAlignment="Center"
+                               Text="濃さ"
+                               Width="48" />
+                    <Slider x:Name="ShadowOpacitySlider"
+                            Minimum="0"
+                            Maximum="100"
+                            Thumb.DragCompleted="OnSliderDragCompleted"
+                            ValueChanged="OnShadowOpacityChanged" />
+                </DockPanel>
+                <DockPanel Margin="0,4,0,0">
+                    <TextBlock x:Name="ShadowBlurText"
+                               Width="40"
+                               DockPanel.Dock="Right"
+                               HorizontalAlignment="Right"
+                               VerticalAlignment="Center" />
+                    <TextBlock VerticalAlignment="Center"
+                               Text="ぼかし"
+                               Width="48" />
+                    <Slider x:Name="ShadowBlurSlider"
+                            Minimum="0"
+                            Maximum="40"
+                            Thumb.DragCompleted="OnSliderDragCompleted"
+                            ValueChanged="OnShadowBlurChanged" />
+                </DockPanel>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="8" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0">
+                    <TextBlock Style="{StaticResource FieldLabelStyle}"
+                               Text="影のずれ 横 (px)" />
+                    <TextBox x:Name="ShadowOffsetXBox"
+                             TextChanged="OnShadowOffsetChanged" />
+                </StackPanel>
+                <StackPanel Grid.Column="2">
+                    <TextBlock Style="{StaticResource FieldLabelStyle}"
+                               Text="縦 (px)" />
+                    <TextBox x:Name="ShadowOffsetYBox"
+                             TextChanged="OnShadowOffsetChanged" />
+                </StackPanel>
+            </Grid>
             </StackPanel>
         </StackPanel>
     </StackPanel>

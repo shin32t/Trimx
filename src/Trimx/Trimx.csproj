@@ -7,11 +7,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationIcon>..\..\assets\branding\trimx.ico</ApplicationIcon>
-    <Version>0.1.0</Version>
+    <Version>0.2.0</Version>
     <Product>Trimx</Product>
     <Authors>shin32t</Authors>
     <Copyright>Copyright (c) 2026 shin32t</Copyright>
-    <!-- Release builds do not carry the source link / commit hash suffix, so the file version stays 0.1.0. -->
+    <!-- Release builds do not carry the source link / commit hash suffix, so the file version stays 0.2.0. -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>
   </PropertyGroup>
 

@@ -18,6 +18,34 @@ public static class ShapeHandles
 
     public static int CountFor(ShapeKind kind) => kind.IsSegment() ? ArrowHandleCount : BoxHandleCount;
 
+    // The end that stays put while the other one is dragged.
+    private static SKPoint AnchorOf(ShapeGeometry geometry, int handle) => handle == 0
+        ? new SKPoint(geometry.X + geometry.Width, geometry.Y + geometry.Height)
+        : new SKPoint(geometry.X, geometry.Y);
+
+    // Eight directions, 45 degrees apart, starting to the right and turning clockwise on screen (y grows downward).
+    private static readonly (int X, int Y)[] _directions = { (1, 0), (1, 1), (0, 1), (-1, 1), (-1, 0), (-1, -1), (0, -1), (1, -1) };
+
+    /// <summary>
+    /// Moves <paramref name="pointer"/> to the nearest multiple of 45 degrees around <paramref name="anchor"/>,
+    /// keeping its distance from the anchor. Diagonals get equal x and y steps, so they are exactly 45 degrees on whole pixels.
+    /// </summary>
+    internal static SKPoint SnapToAngle(SKPoint anchor, SKPoint pointer)
+    {
+        var dx = pointer.X - anchor.X;
+        var dy = pointer.Y - anchor.Y;
+        var length = MathF.Sqrt(dx * dx + dy * dy);
+        if (length < 0.5f)
+        {
+            return pointer;
+        }
+
+        var step = (int)MathF.Round(MathF.Atan2(dy, dx) / (MathF.PI / 4f));
+        var (ux, uy) = _directions[((step % 8) + 8) % 8];
+        var reach = ux != 0 && uy != 0 ? MathF.Round(length / MathF.Sqrt(2f)) : MathF.Round(length);
+        return new SKPoint(MathF.Round(anchor.X) + ux * reach, MathF.Round(anchor.Y) + uy * reach);
+    }
+
     /// <summary>Handle positions in document coordinates.</summary>
     public static SKPoint[] GetPoints(ShapeLayer shape)
     {
@@ -49,8 +77,17 @@ public static class ShapeHandles
     /// computed from the geometry when the drag started so the opposite edge or end stays put even
     /// when the pointer crosses it (the shape flips).
     /// </summary>
-    public static ShapeGeometry Drag(ShapeKind kind, ShapeGeometry original, int handle, SKPoint pointer)
+    /// <param name="snapAngle">
+    /// True (Shift held) snaps a line or an arrow to a multiple of 45 degrees around its other end, keeping the distance to the pointer.
+    /// Rectangles and ellipses are not affected.
+    /// </param>
+    public static ShapeGeometry Drag(ShapeKind kind, ShapeGeometry original, int handle, SKPoint pointer, bool snapAngle = false)
     {
+        if (snapAngle && kind.IsSegment())
+        {
+            pointer = SnapToAngle(AnchorOf(original, handle), pointer);
+        }
+
         var px = (int)MathF.Round(pointer.X);
         var py = (int)MathF.Round(pointer.Y);
 
