@@ -25,6 +25,7 @@ if (Test-Path $staging) { Remove-Item $staging -Recurse -Force }
 Copy-Item $publishDir $staging -Recurse
 Copy-Item (Join-Path $root 'LICENSE') $staging
 Copy-Item (Join-Path $root 'THIRD-PARTY-NOTICES.md') $staging
+Copy-Item (Join-Path $root 'licenses') $staging -Recurse
 $zip = Join-Path $outputDir "Trimx-$version-win-x64.zip"
 if (Test-Path $zip) { Remove-Item $zip }
 Compress-Archive -Path $staging -DestinationPath $zip

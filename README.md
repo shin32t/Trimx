@@ -36,6 +36,18 @@ Download the installer (`Trimx-<version>-win-x64-setup.exe`) or the portable zip
 
 > **Windows SmartScreen warning:** Trimx is not code-signed, so Windows may show "Windows protected your PC" when you run the installer. Click **More info**, then **Run anyway**.
 
+## Updates
+
+Trimx checks GitHub Releases in the background after it starts. When a newer version exists, an **Update** button appears at the right end of the toolbar. Click it to download the update (a progress window is shown), restart, and continue where you left off. Open tabs, including unsaved edits, are restored after the restart (the undo history is not).
+
+To install updates without clicking, turn on "Update automatically at startup" in the settings dialog.
+
+Updating is offered only for an installed copy whose folder you can write to (for example the default per-user install). If you installed Trimx for all users under `Program Files`, download the new installer yourself.
+
+## Recovery after a crash
+
+Tabs with unsaved changes (and tabs not saved to a file yet) are copied to `%LOCALAPPDATA%\Trimx\Backup\` shortly after each change. If Trimx ends abnormally, the tabs come back the next time you start it. Closing the app normally, after saving or discarding, removes the backup.
+
 ## Tech stack
 
 | Item | Technology |
@@ -87,16 +99,20 @@ dotnet run --project src/Trimx/Trimx.csproj
 
 ## Packaging
 
-`installer/build.ps1` publishes the app (win-x64, self-contained .NET runtime, ReadyToRun), creates a portable zip, and builds an installer if Inno Setup 6 or later is available. Output goes to `installer/output/`. The binaries are not code-signed, so Windows SmartScreen shows a warning.
+`installer/build.ps1` publishes the app (win-x64, self-contained .NET runtime, ReadyToRun), creates a portable zip, and builds an installer if Inno Setup 6 or later is available. Output goes to `installer/output/`. The `licenses/` folder (full license texts of the dependencies) is included in both. The binaries are not code-signed, so Windows SmartScreen shows a warning.
 
-Releases are created by GitHub Actions (`.github/workflows/release.yml`). Set `<Version>` in `src/Trimx/Trimx.csproj`, then push a tag such as `v0.2.0`; a draft release with the installer and zip is created for review.
+Releases are created by GitHub Actions (`.github/workflows/release.yml`). Set `<Version>` in `src/Trimx/Trimx.csproj`, then push a tag such as `v0.2.0`; a draft release with the installer and zip is created for review. The in-app update looks for the latest published release (not a draft or pre-release) and downloads its `Trimx-<version>-win-x64.zip`, so keep that file name.
+
+To see the update button without a newer release, start the app with `--debug`.
 
 ## Where data is stored
 
-Trimx creates two files in `%LOCALAPPDATA%\Trimx\`:
+Trimx stores its data in `%LOCALAPPDATA%\Trimx\`:
 
 - `TrimxSetting.json`: options chosen in the settings dialog (theme, toolbar labels, etc.)
 - `TrimxState.json`: things the app remembers on its own (last image size, my colors, last pen / text / shape appearance, etc.)
+- `Backup\`: copies of open tabs for recovery (see above); removed on a normal exit
+- `Update\`: temporary files of an update and `update.log`
 
 ## Status
 
