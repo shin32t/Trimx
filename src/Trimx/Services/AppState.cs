@@ -1,3 +1,5 @@
+using Trimx.Core.Documents;
+
 namespace Trimx.Services;
 
 /// <summary>
@@ -76,6 +78,17 @@ public sealed class ShapeStyle
     public string Dash { get; set; } = string.Empty;
 
     public float CornerRadius { get; set; }
+
+    public bool HasShadow { get; set; }
+
+    // Defaults, so a state file from before shape shadows still gives a sensible look when the shadow is switched on.
+    public float ShadowOpacity { get; set; } = IShadowed.DefaultOpacity;
+
+    public float ShadowBlur { get; set; } = IShadowed.DefaultBlur;
+
+    public float ShadowOffsetX { get; set; } = IShadowed.DefaultOffset;
+
+    public float ShadowOffsetY { get; set; } = IShadowed.DefaultOffset;
 
     /// <summary>Last width and height per shape kind ("Rectangle", "Line", ...), since a line is shaped differently from a box.</summary>
     public Dictionary<string, ShapeSize> Sizes { get; set; } = new();

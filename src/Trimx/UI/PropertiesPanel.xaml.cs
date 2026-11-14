@@ -82,6 +82,7 @@ public partial class PropertiesPanel : UserControl
         RootPanel.Visibility = text is not null || shape is not null ? Visibility.Visible : Visibility.Collapsed;
         TextSection.Visibility = text is not null ? Visibility.Visible : Visibility.Collapsed;
         ShapeSection.Visibility = shape is not null ? Visibility.Visible : Visibility.Collapsed;
+        ShadowSection.Visibility = _layer is IShadowed ? Visibility.Visible : Visibility.Collapsed;
         EmptyText.Visibility = RootPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
         HeaderText.Text = text is not null ? "テキストの設定" : "図形の設定";
 
@@ -106,14 +107,6 @@ public partial class PropertiesPanel : UserControl
                     SetNumber(FontSizeBox, text.FontSize);
                     BoldCheck.IsChecked = text.IsBold;
                     ItalicCheck.IsChecked = text.IsItalic;
-                    ShadowCheck.IsChecked = text.HasShadow;
-                    ShadowOptions.IsEnabled = text.HasShadow;
-                    ShadowOpacitySlider.Value = MathF.Round(text.ShadowOpacity * 100f);
-                    ShadowOpacityText.Text = $"{MathF.Round(text.ShadowOpacity * 100f)}%";
-                    ShadowBlurSlider.Value = MathF.Round(text.ShadowBlur);
-                    ShadowBlurText.Text = $"{MathF.Round(text.ShadowBlur)}px";
-                    SetNumber(ShadowOffsetXBox, text.ShadowOffsetX);
-                    SetNumber(ShadowOffsetYBox, text.ShadowOffsetY);
                     SetNumber(OutlineWidthBox, text.OutlineWidth);
                     OutlineColorField.SetColor(text.OutlineColor);
                     TextColorField.SetColor(text.Color);
@@ -136,6 +129,17 @@ public partial class PropertiesPanel : UserControl
                     break;
             }
 
+            if (_layer is IShadowed shadowed)
+            {
+                ShadowCheck.IsChecked = shadowed.HasShadow;
+                ShadowOptions.IsEnabled = shadowed.HasShadow;
+                ShadowOpacitySlider.Value = MathF.Round(shadowed.ShadowOpacity * 100f);
+                ShadowOpacityText.Text = $"{MathF.Round(shadowed.ShadowOpacity * 100f)}%";
+                ShadowBlurSlider.Value = MathF.Round(shadowed.ShadowBlur);
+                ShadowBlurText.Text = $"{MathF.Round(shadowed.ShadowBlur)}px";
+                SetNumber(ShadowOffsetXBox, shadowed.ShadowOffsetX);
+                SetNumber(ShadowOffsetYBox, shadowed.ShadowOffsetY);
+            }
         }
         finally
         {
@@ -213,37 +217,58 @@ public partial class PropertiesPanel : UserControl
         }
     }
 
+    // --- Shadow (text and shapes) ---
+
+    // The generic command methods need the concrete layer type, so each call picks it.
+    private IDocumentCommand? ShadowCommand(
+        Func<TextLayer, IDocumentCommand> forText,
+        Func<ShapeLayer, IDocumentCommand> forShape)
+    {
+        return _layer switch
+        {
+            TextLayer text => forText(text),
+            ShapeLayer shape => forShape(shape),
+            _ => null,
+        };
+    }
+
     private void OnShadowClick(object sender, RoutedEventArgs e)
     {
-        if (!_isSyncing && _layer is TextLayer text)
+        if (!_isSyncing && _layer is IShadowed)
         {
-            Apply(LayerCommands.SetHasShadow(text, ShadowCheck.IsChecked == true));
-            _tab?.History.EndMerge();
+            var on = ShadowCheck.IsChecked == true;
+            if (ShadowCommand(t => LayerCommands.SetHasShadow(t, on), s => LayerCommands.SetHasShadow(s, on)) is { } command)
+            {
+                Apply(command);
+                _tab?.History.EndMerge();
+            }
         }
     }
 
     private void OnShadowOpacityChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
-        if (!_isSyncing && _layer is TextLayer text)
+        if (!_isSyncing && _layer is IShadowed shadowed)
         {
             var opacity = (float)Math.Round(e.NewValue) / 100f;
             ShadowOpacityText.Text = $"{Math.Round(e.NewValue)}%";
-            if (opacity != text.ShadowOpacity)
+            if (opacity != shadowed.ShadowOpacity
+                && ShadowCommand(t => LayerCommands.SetShadowOpacity(t, opacity), s => LayerCommands.SetShadowOpacity(s, opacity)) is { } command)
             {
-                Apply(LayerCommands.SetShadowOpacity(text, opacity));
+                Apply(command);
             }
         }
     }
 
     private void OnShadowBlurChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
     {
-        if (!_isSyncing && _layer is TextLayer text)
+        if (!_isSyncing && _layer is IShadowed shadowed)
         {
             var blur = (float)Math.Round(e.NewValue);
             ShadowBlurText.Text = $"{blur}px";
-            if (blur != text.ShadowBlur)
+            if (blur != shadowed.ShadowBlur
+                && ShadowCommand(t => LayerCommands.SetShadowBlur(t, blur), s => LayerCommands.SetShadowBlur(s, blur)) is { } command)
             {
-                Apply(LayerCommands.SetShadowBlur(text, blur));
+                Apply(command);
             }
         }
     }
@@ -256,22 +281,30 @@ public partial class PropertiesPanel : UserControl
 
     private void OnShadowOffsetChanged(object sender, TextChangedEventArgs e)
     {
-        if (_isSyncing || _layer is not TextLayer text)
+        if (_isSyncing || _layer is not IShadowed shadowed)
         {
             return;
         }
 
+        IDocumentCommand? command = null;
         if (sender == ShadowOffsetXBox && TryParseNumber(ShadowOffsetXBox.Text, out var x)
-            && Math.Abs(x) <= 1000f && x != text.ShadowOffsetX)
+            && Math.Abs(x) <= 1000f && x != shadowed.ShadowOffsetX)
         {
-            Apply(LayerCommands.SetShadowOffsetX(text, x));
+            command = ShadowCommand(t => LayerCommands.SetShadowOffsetX(t, x), s => LayerCommands.SetShadowOffsetX(s, x));
         }
         else if (sender == ShadowOffsetYBox && TryParseNumber(ShadowOffsetYBox.Text, out var y)
-            && Math.Abs(y) <= 1000f && y != text.ShadowOffsetY)
+            && Math.Abs(y) <= 1000f && y != shadowed.ShadowOffsetY)
         {
-            Apply(LayerCommands.SetShadowOffsetY(text, y));
+            command = ShadowCommand(t => LayerCommands.SetShadowOffsetY(t, y), s => LayerCommands.SetShadowOffsetY(s, y));
+        }
+
+        if (command is not null)
+        {
+            Apply(command);
         }
     }
+
+    // --- Text (continued) ---
 
     private void OnOutlineWidthChanged(object sender, TextChangedEventArgs e)
     {

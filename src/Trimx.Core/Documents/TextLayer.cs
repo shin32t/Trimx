@@ -6,7 +6,7 @@ namespace Trimx.Core.Documents;
 /// An editable text layer. <see cref="Layer.X"/> / <see cref="Layer.Y"/> are the top-left of the text block.
 /// Lines are separated by a line feed.
 /// </summary>
-public sealed class TextLayer : Layer
+public sealed class TextLayer : Layer, IShadowed
 {
     /// <summary>Default font; covers both Japanese and Latin glyphs on Windows 11.</summary>
     public const string DefaultFontFamily = "Yu Gothic UI";
@@ -18,10 +18,10 @@ public sealed class TextLayer : Layer
     private bool _isBold;
     private bool _isItalic;
     private bool _hasShadow;
-    private float _shadowOpacity = 0.5f;
-    private float _shadowBlur = 4f;
-    private float _shadowOffsetX = 4f;
-    private float _shadowOffsetY = 4f;
+    private float _shadowOpacity = IShadowed.DefaultOpacity;
+    private float _shadowBlur = IShadowed.DefaultBlur;
+    private float _shadowOffsetX = IShadowed.DefaultOffset;
+    private float _shadowOffsetY = IShadowed.DefaultOffset;
     private float _outlineWidth;
     private SKColor _outlineColor = SKColors.White;
 

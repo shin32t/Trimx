@@ -25,11 +25,17 @@ if (Test-Path $staging) { Remove-Item $staging -Recurse -Force }
 Copy-Item $publishDir $staging -Recurse
 Copy-Item (Join-Path $root 'LICENSE') $staging
 Copy-Item (Join-Path $root 'THIRD-PARTY-NOTICES.md') $staging
+Copy-Item (Join-Path $root 'licenses') $staging -Recurse
 $zip = Join-Path $outputDir "Trimx-$version-win-x64.zip"
 if (Test-Path $zip) { Remove-Item $zip }
 Compress-Archive -Path $staging -DestinationPath $zip
 Remove-Item $staging -Recurse -Force
 Write-Host "Created $zip"
+
+# The app's self-update checks the downloaded zip against this hash (GitHub also reports it as the asset digest).
+$hash = (Get-FileHash $zip -Algorithm SHA256).Hash.ToLower()
+Set-Content -Path "$zip.sha256" -Value "$hash  $(Split-Path -Leaf $zip)" -Encoding ascii
+Write-Host "SHA-256 $hash"
 
 # Installer, when Inno Setup 6 or later is available. The newest version wins.
 $roots = @(${env:ProgramFiles(x86)}, $env:ProgramFiles, (Join-Path $env:LOCALAPPDATA 'Programs')) | Where-Object { $_ }

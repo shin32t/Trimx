@@ -24,7 +24,11 @@ public sealed class DocumentTab : INotifyPropertyChanged, IDisposable
         Document = document;
         _title = document.Title;
         _selectedLayer = document.Layers.Count > 0 ? document.Layers[^1] : null;
-        History.Changed += (_, _) => RaiseModifiedChanged();
+        History.Changed += (_, _) =>
+        {
+            BackupDirty = true;
+            RaiseModifiedChanged();
+        };
 
         // A selection is in canvas pixels, so it means nothing once the canvas changes size.
         Document.SizeChanged += (_, _) => Selection = null;
@@ -50,6 +54,12 @@ public sealed class DocumentTab : INotifyPropertyChanged, IDisposable
             }
         }
     }
+
+    /// <summary>Names this tab's file in the backup folder. Stable for the life of the tab (and across a restore).</summary>
+    public string BackupId { get; set; } = Guid.NewGuid().ToString("N");
+
+    /// <summary>True if the document changed since its backup file was written (see BackupService).</summary>
+    public bool BackupDirty { get; set; } = true;
 
     /// <summary>True if the document has changes that were not saved or exported.</summary>
     public bool IsModified => History.IsModified;

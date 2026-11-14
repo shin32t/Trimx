@@ -97,6 +97,11 @@ public static class ProjectFileService
                     dto.FillColor = FormatColor(shape.FillColor);
                     dto.Dash = shape.Dash.ToString();
                     dto.CornerRadius = shape.CornerRadius;
+                    dto.HasShadow = shape.HasShadow;
+                    dto.ShadowOpacity = shape.ShadowOpacity;
+                    dto.ShadowBlur = shape.ShadowBlur;
+                    dto.ShadowOffsetX = shape.ShadowOffsetX;
+                    dto.ShadowOffsetY = shape.ShadowOffsetY;
                     break;
 
                 default:
@@ -208,6 +213,13 @@ public static class ProjectFileService
                 // Absent or unknown values (older files) fall back to a plain solid outline.
                 Dash = Enum.TryParse<ShapeDash>(dto.Dash, ignoreCase: true, out var dash) && Enum.IsDefined(dash) ? dash : ShapeDash.Solid,
                 CornerRadius = dto.CornerRadius is { } radius && float.IsFinite(radius) ? radius : 0f,
+
+                // Files from before shape shadows have none of these: no shadow, default look if it is switched on later.
+                HasShadow = dto.HasShadow ?? false,
+                ShadowOpacity = Finite(dto.ShadowOpacity, IShadowed.DefaultOpacity),
+                ShadowBlur = Finite(dto.ShadowBlur, IShadowed.DefaultBlur),
+                ShadowOffsetX = Finite(dto.ShadowOffsetX, IShadowed.DefaultOffset),
+                ShadowOffsetY = Finite(dto.ShadowOffsetY, IShadowed.DefaultOffset),
             },
             _ => throw new InvalidDataException($"未対応のレイヤー種別です: {dto.Type}"),
         };

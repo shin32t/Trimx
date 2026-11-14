@@ -14,12 +14,14 @@ public partial class MainWindow : Window
     private readonly ObservableCollection<DocumentTab> _tabs = new();
     private int _clipboardTabCount;
     private int _untitledTabCount;
+    private bool _firstContentRendered;
 
     public MainWindow()
     {
         InitializeComponent();
         LoadPenFromState();
         LoadLayoutFromState();
+        ShowUpdateButton(updateAvailable: false);
         Canvas.PenModeChanged += OnPenModeChanged;
         Canvas.SelectModeChanged += OnSelectModeChanged;
         TabStrip.ItemsSource = _tabs;
@@ -34,13 +36,50 @@ public partial class MainWindow : Window
     private void OnFirstContentRendered(object? sender, EventArgs e)
     {
         ContentRendered -= OnFirstContentRendered;
+        _firstContentRendered = true;
         Canvas.Focus();
-        OpenClipboardImageInNewTab();
+
+        // After an abnormal end (crash, update restart) the previous tabs come back instead of the clipboard image.
+        if (!RestoreBackup())
+        {
+            OpenClipboardImageInNewTab();
+        }
+
+        CheckForUpdateAsync();
+    }
+
+    /// <summary>
+    /// Called when the user starts Trimx again while it is running: brings this window forward and,
+    /// if the clipboard has an image, opens it in a new tab (plan.md 3.3).
+    /// </summary>
+    public void ActivateFromAnotherInstance()
+    {
+        if (WindowState == WindowState.Minimized)
+        {
+            WindowState = WindowState.Normal;
+        }
+
+        Activate();
+        // Windows can refuse to give focus to a background app; toggling Topmost still raises the window.
+        Topmost = true;
+        Topmost = false;
+
+        // Before the first render the startup path loads the clipboard itself; doing it here too would add a duplicate tab.
+        if (_firstContentRendered)
+        {
+            OpenClipboardImageInNewTab();
+        }
     }
 
     protected override void OnClosing(CancelEventArgs e)
     {
         base.OnClosing(e);
+
+        // Quitting for an update: the tabs are already backed up and come back after the restart.
+        if (_closingForUpdate)
+        {
+            return;
+        }
 
         // Ask for each document with unsaved changes; cancelling any one of them keeps the app open.
         foreach (var tab in _tabs.ToList())
@@ -51,6 +90,10 @@ public partial class MainWindow : Window
                 return;
             }
         }
+
+        // Every tab was saved or discarded on purpose, so nothing is left to restore.
+        _backupTimer?.Stop();
+        BackupService.Clear();
     }
 
     protected override void OnClosed(EventArgs e)
@@ -438,7 +481,9 @@ public partial class MainWindow : Window
     private DocumentTab AddTab(ImageDocument document)
     {
         var tab = new DocumentTab(document);
+        tab.History.Changed += (_, _) => ScheduleBackup();
         _tabs.Add(tab);
+        ScheduleBackup();
         TabStrip.SelectedItem = tab;
         TabStrip.ScrollIntoView(tab);
         return tab;
@@ -489,5 +534,6 @@ public partial class MainWindow : Window
 
         _tabs.RemoveAt(index);
         tab.Dispose();
+        ScheduleBackup();
     }
 }

@@ -91,6 +91,11 @@ public static class StateService
                     FillColor = FormatColor(shape.FillColor),
                     Dash = shape.Dash.ToString(),
                     CornerRadius = shape.CornerRadius,
+                    HasShadow = shape.HasShadow,
+                    ShadowOpacity = shape.ShadowOpacity,
+                    ShadowBlur = shape.ShadowBlur,
+                    ShadowOffsetX = shape.ShadowOffsetX,
+                    ShadowOffsetY = shape.ShadowOffsetY,
                     Sizes = Current.Shape?.Sizes ?? new Dictionary<string, ShapeSize>(),
                 };
                 Current.Shape.Sizes[shape.Kind.ToString()] = new ShapeSize { Width = shape.Width, Height = shape.Height };
@@ -142,6 +147,11 @@ public static class StateService
         layer.FillColor = ParseColor(style.FillColor, layer.FillColor);
         layer.Dash = Enum.TryParse<ShapeDash>(style.Dash, out var dash) && Enum.IsDefined(dash) ? dash : layer.Dash;
         layer.CornerRadius = Finite(style.CornerRadius, layer.CornerRadius);
+        layer.HasShadow = style.HasShadow;
+        layer.ShadowOpacity = Finite(style.ShadowOpacity, layer.ShadowOpacity);
+        layer.ShadowBlur = Finite(style.ShadowBlur, layer.ShadowBlur);
+        layer.ShadowOffsetX = Finite(style.ShadowOffsetX, layer.ShadowOffsetX);
+        layer.ShadowOffsetY = Finite(style.ShadowOffsetY, layer.ShadowOffsetY);
 
         // The size is remembered per kind. The new layer is never larger than the canvas.
         if (style.Sizes is { } sizes && sizes.TryGetValue(layer.Kind.ToString(), out var size) && (size.Width != 0 || size.Height != 0))
