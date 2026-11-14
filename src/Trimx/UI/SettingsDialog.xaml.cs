@@ -31,6 +31,7 @@ public partial class SettingsDialog : Window
         }
 
         LabelsCheck.IsChecked = settings.ShowToolbarLabels;
+        AutoUpdateCheck.IsChecked = settings.AutoUpdate;
         DefaultTextBox.Text = settings.DefaultTextLabel;
         CopyrightText.Text = $"Trimx {AppVersion.Text}  ©  2026 shin32t";
         _isLoading = false;
@@ -75,6 +76,13 @@ public partial class SettingsDialog : Window
 
         var settings = SettingsService.Load();
         settings.DefaultTextLabel = DefaultTextBox.Text;
+        SettingsService.Save(settings);
+    }
+
+    private void OnAutoUpdateClick(object sender, RoutedEventArgs e)
+    {
+        var settings = SettingsService.Load();
+        settings.AutoUpdate = AutoUpdateCheck.IsChecked == true;
         SettingsService.Save(settings);
     }
 

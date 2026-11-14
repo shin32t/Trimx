@@ -41,6 +41,13 @@ public partial class MainWindow
         {
             _pendingUpdate = update;
             ShowUpdateButton(updateAvailable: true);
+
+            // The "update automatically" setting: do what the button would do, but without error pop-ups at startup.
+            // If it does not work, the button stays for the user to try.
+            if (SettingsService.Load().AutoUpdate)
+            {
+                await RunUpdateAsync(update, silentOnError: true);
+            }
         }
     }
 
@@ -52,6 +59,12 @@ public partial class MainWindow
             return;
         }
 
+        await RunUpdateAsync(update, silentOnError: false);
+    }
+
+    /// <summary>Downloads the update, backs up the tabs, and restarts into the new version.</summary>
+    private async Task RunUpdateAsync(UpdateInfo update, bool silentOnError)
+    {
         var dialog = new UpdateProgressWindow { Owner = this };
         var progress = new Progress<double>(dialog.SetProgress);
         dialog.Show();
@@ -68,7 +81,11 @@ public partial class MainWindow
         }
         catch (Exception ex) when (ex is HttpRequestException or IOException or InvalidDataException or UnauthorizedAccessException)
         {
-            MessageBox.Show(this, $"更新をダウンロードできませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (!silentOnError)
+            {
+                MessageBox.Show(this, $"更新をダウンロードできませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
             return;
         }
         finally
@@ -85,7 +102,11 @@ public partial class MainWindow
         }
         catch (Exception ex) when (ex is IOException or System.ComponentModel.Win32Exception)
         {
-            MessageBox.Show(this, $"更新を開始できませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+            if (!silentOnError)
+            {
+                MessageBox.Show(this, $"更新を開始できませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
+
             return;
         }
 

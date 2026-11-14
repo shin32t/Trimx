@@ -38,6 +38,14 @@
 
         <TextBlock Margin="0,18,0,0"
                    FontWeight="SemiBold"
+                   Text="更新" />
+        <CheckBox x:Name="AutoUpdateCheck"
+                  Margin="0,8,0,0"
+                  Content="起動時に新しいバージョンがあれば、自動で更新する"
+                  Click="OnAutoUpdateClick" />
+
+        <TextBlock Margin="0,18,0,0"
+                   FontWeight="SemiBold"
                    Text="テキスト" />
         <TextBlock Margin="0,8,0,0"
                    Text="新しいテキストの初期文字列" />

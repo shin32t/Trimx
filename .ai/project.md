@@ -34,7 +34,7 @@ Always confirm the build passes after making changes.
 - The installer is per-user by default (no admin rights). Never change the `AppId` GUID; it identifies upgrades.
 - Binaries are not signed (SmartScreen warns). The app icon and README banner are in `assets/branding/`; `ApplicationIcon` embeds the multi-resolution `.ico` in the exe.
 - Self-update uses GitHub Releases of `shin32t/Trimx` (see implementation-notes). A release must be tagged `v<version>` and attach `installer/output/Trimx-<version>-win-x64.zip` (the portable zip made by `build.ps1`, which also writes its `.sha256`); drafts and prereleases are ignored.
-- Release files include `LICENSE` and `THIRD-PARTY-NOTICES.md`.
+- Release files include `LICENSE`, `THIRD-PARTY-NOTICES.md` and the `licenses/` folder.
 - Releases are automated by `.github/workflows/release.yml`: pushing a tag `vX.Y.Z` builds on a Windows runner with `installer/build.ps1` and creates a **draft** GitHub Release (installer + zip, generated notes). The tag must equal `v` + `<Version>` in `src/Trimx/Trimx.csproj`, or the run fails. "Run workflow" in the Actions tab builds without releasing and keeps the files as an artifact. The workflow has not run on GitHub yet.
 - The published exe has been verified to start (window shown, clean exit). The installer builds successfully with Inno Setup 7.1.1 (`installer/output/Trimx-<version>-win-x64-setup.exe`, about 60 MB), but installing and uninstalling it has not been tested.
 
@@ -53,4 +53,4 @@ Do not mix the two. Read and write settings as "reload, modify, save" so other f
 
 ## License
 
-MIT (`LICENSE`; author shin32t). Third-party libraries (SkiaSharp, OpenTK family, GLFW) are listed in `THIRD-PARTY-NOTICES.md`. When you add a dependency, update that file too.
+MIT (`LICENSE`; author shin32t). Third-party libraries (SkiaSharp, OpenTK family, GLFW) are listed in `THIRD-PARTY-NOTICES.md`. The full texts are in `licenses/` (copied into the zip and the installer by `build.ps1` / `Trimx.iss`). When you add or change a dependency, update both `THIRD-PARTY-NOTICES.md` and `licenses/`.
