@@ -11,7 +11,7 @@
                     Margin="0,0,6,0"
                     BorderThickness="1"
                     Cursor="Hand"
-                    ToolTip="クリックでカラーピッカーを開く"
+                    ToolTip="{DynamicResource color.open.tip}"
                     MouseLeftButtonUp="OnSwatchClick">
                 <Border.Style>
                     <Style TargetType="Border">
@@ -28,13 +28,13 @@
                     DockPanel.Dock="Right"
                     Margin="6,0,0,0"
                     Padding="8,2"
-                    Content="なし"
-                    ToolTip="透明にする"
+                    Content="{DynamicResource color.none}"
+                    ToolTip="{DynamicResource color.none.tip}"
                     Visibility="Collapsed"
                     Click="OnNoneClick" />
             <TextBox x:Name="HexBox"
                      VerticalContentAlignment="Center"
-                     ToolTip="#RRGGBB または #AARRGGBB"
+                     ToolTip="{DynamicResource color.hex.tip}"
                      TextChanged="OnHexTextChanged"
                      LostFocus="OnHexLostFocus" />
         </DockPanel>

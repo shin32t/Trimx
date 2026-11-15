@@ -1,6 +1,7 @@
 using SkiaSharp;
 using Trimx.Core.Documents;
 using Trimx.Core.Rendering;
+using Trimx.Core.Localization;
 
 namespace Trimx.Core.Services;
 
@@ -48,7 +49,7 @@ public static class ImageExportService
 
         if (!ok)
         {
-            throw new IOException($"{format} への書き出しに失敗しました。");
+            throw new IOException(Loc.Get("core.export.failed", format));
         }
     }
 }

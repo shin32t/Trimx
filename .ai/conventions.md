@@ -30,5 +30,6 @@ Follow the Microsoft C# coding conventions (not strictly).
 - When unsure about behavior, check `docs/plan.md`. **Do not add features that are not in plan.md.** If you change the specification, update plan.md too.
 - After changes, confirm `dotnet build Trimx.slnx` succeeds.
 - When adding a NuGet package, state the reason (the app is kept lightweight on purpose), and update `THIRD-PARTY-NOTICES.md`.
+- UI text: never write user-facing text directly in code or XAML. Add a key to both `src/Trimx.Core/Localization/ja.json` and `en.json` (same placeholders), then use `Loc.Get("key")` or `{DynamicResource key}`. Key names are `area.name` (for example `tb.undo`, `err.save`, `core.proj.corrupt`). Tooltips that explain a button end in `.tip`.
 - When you implement or change a feature, update the relevant part of `.ai/implementation-notes.md`.
 - When you change `.ai/`, edit only `.ai/`; do not copy content into the entry-point files (`AGENTS.md`, etc.).

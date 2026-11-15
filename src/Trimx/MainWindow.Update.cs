@@ -4,6 +4,7 @@ using System.Windows;
 using Trimx.Core.Updates;
 using Trimx.Services;
 using Trimx.UI;
+using Trimx.Core.Localization;
 
 namespace Trimx;
 
@@ -20,8 +21,8 @@ public partial class MainWindow
     {
         UpdateButton.Visibility = updateAvailable || DebugMode.IsEnabled ? Visibility.Visible : Visibility.Collapsed;
         UpdateButton.ToolTip = updateAvailable && _pendingUpdate is { } update
-            ? $"新しいバージョン {update.Version} に更新して再起動します"
-            : "デバッグモード: 更新はありません";
+            ? Loc.Get("upd.tip.available", update.Version)
+            : Loc.Get("upd.tip.debug");
     }
 
     /// <summary>
@@ -55,7 +56,7 @@ public partial class MainWindow
     {
         if (_pendingUpdate is not { } update)
         {
-            MessageBox.Show(this, "デバッグモード: 更新はありません。", "Trimx", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, Loc.Get("upd.msg.debug"), "Trimx", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
@@ -64,6 +65,24 @@ public partial class MainWindow
 
     /// <summary>Downloads the update, backs up the tabs, and restarts into the new version.</summary>
     private async Task RunUpdateAsync(UpdateInfo update, bool silentOnError)
+    {
+        // The startup update and one chosen in the settings dialog share a staging folder, so never run two.
+        if (!UpdateService.TryBeginUpdate())
+        {
+            return;
+        }
+
+        try
+        {
+            await DownloadAndRestartAsync(update, silentOnError);
+        }
+        finally
+        {
+            UpdateService.EndUpdate();
+        }
+    }
+
+    private async Task DownloadAndRestartAsync(UpdateInfo update, bool silentOnError)
     {
         var dialog = new UpdateProgressWindow { Owner = this };
         var progress = new Progress<double>(dialog.SetProgress);
@@ -83,7 +102,7 @@ public partial class MainWindow
         {
             if (!silentOnError)
             {
-                MessageBox.Show(this, $"更新をダウンロードできませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(this, Loc.Get("err.updatedownload", ex.Message), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             return;
@@ -104,7 +123,7 @@ public partial class MainWindow
         {
             if (!silentOnError)
             {
-                MessageBox.Show(this, $"更新を開始できませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(this, Loc.Get("err.updatestart", ex.Message), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             return;

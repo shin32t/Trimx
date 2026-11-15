@@ -4,6 +4,7 @@ using SkiaSharp;
 using Trimx.Core.Commands;
 using Trimx.Core.Documents;
 using Trimx.Core.Editing;
+using Trimx.Core.Localization;
 
 namespace Trimx.UI;
 
@@ -90,13 +91,13 @@ public partial class CanvasView
                 }
                 else
                 {
-                    _tab.AddLayerAboveSelection(LayerFactory.CreateStrokeImage(_tab.Document, points, PenColor, PenWidth, "ペン"));
+                    _tab.AddLayerAboveSelection(LayerFactory.CreateStrokeImage(_tab.Document, points, PenColor, PenWidth, Loc.Get("common.pen")));
                 }
             }
             catch (Exception ex) when (ex is InvalidOperationException or OutOfMemoryException)
             {
                 // Typically a failed pixel allocation for a very large canvas; the stroke is dropped.
-                MessageBox.Show(Window.GetWindow(this), $"線を描けませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(Window.GetWindow(this), Loc.Get("err.pen", ex.Message), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
         }
 

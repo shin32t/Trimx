@@ -7,6 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <!-- UI texts by key; the logical name is what Loc reads. -->
+    <EmbeddedResource Include="Localization\*.json" LogicalName="Trimx.Core.Localization.%(Filename)%(Extension)" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="SkiaSharp" Version="4.156.0" />
   </ItemGroup>
 

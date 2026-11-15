@@ -1,5 +1,6 @@
 using SkiaSharp;
 using Trimx.Core.Documents;
+using Trimx.Core.Localization;
 
 namespace Trimx.Core.Services;
 
@@ -17,14 +18,14 @@ public static class ImageImportService
         // The size is read from the header first, so a tiny file that claims a huge image
         // cannot make the decoder allocate gigabytes.
         using var data = SKData.Create(stream);
-        using var codec = SKCodec.Create(data) ?? throw new InvalidDataException("対応していない画像形式です。");
+        using var codec = SKCodec.Create(data) ?? throw new InvalidDataException(Loc.Get("core.img.unsupported"));
         var info = codec.Info;
         if (info.Width <= 0 || info.Height <= 0 || info.Width > ImageLimits.MaxSide || info.Height > ImageLimits.MaxSide)
         {
-            throw new InvalidDataException($"画像が大きすぎます ({info.Width} × {info.Height})。一辺 {ImageLimits.MaxSide} px までです。");
+            throw new InvalidDataException(Loc.Get("core.img.toolarge", info.Width, info.Height, ImageLimits.MaxSide));
         }
 
-        return SKBitmap.Decode(codec) ?? throw new InvalidDataException("画像を読み込めませんでした。");
+        return SKBitmap.Decode(codec) ?? throw new InvalidDataException(Loc.Get("core.img.loadfail"));
     }
 
     public static SKBitmap DecodeFile(string path)

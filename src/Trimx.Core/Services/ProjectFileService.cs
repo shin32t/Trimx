@@ -3,6 +3,7 @@ using System.IO.Compression;
 using System.Text.Json;
 using SkiaSharp;
 using Trimx.Core.Documents;
+using Trimx.Core.Localization;
 
 namespace Trimx.Core.Services;
 
@@ -105,7 +106,7 @@ public static class ProjectFileService
                     break;
 
                 default:
-                    throw new NotSupportedException($"未対応のレイヤー種別です: {layer.GetType().Name}");
+                    throw new NotSupportedException(Loc.Get("core.proj.unsupportedlayer", layer.GetType().Name));
             }
 
             project.Layers.Add(dto);
@@ -131,33 +132,33 @@ public static class ProjectFileService
         using var archive = new ZipArchive(stream, ZipArchiveMode.Read, leaveOpen: true);
 
         var manifestEntry = archive.GetEntry(ManifestName)
-            ?? throw new InvalidDataException("Trimx のプロジェクトファイルではありません。");
+            ?? throw new InvalidDataException(Loc.Get("core.proj.notproject"));
 
         ProjectDto project;
         try
         {
             using var manifestStream = new MemoryStream(ReadLimited(manifestEntry, MaxManifestBytes));
             project = JsonSerializer.Deserialize<ProjectDto>(manifestStream, _jsonOptions)
-                ?? throw new InvalidDataException("プロジェクトファイルが壊れています。");
+                ?? throw new InvalidDataException(Loc.Get("core.proj.corrupt"));
         }
         catch (JsonException ex)
         {
-            throw new InvalidDataException("プロジェクトファイルが壊れています。", ex);
+            throw new InvalidDataException(Loc.Get("core.proj.corrupt"), ex);
         }
 
         if (project.Version > CurrentVersion)
         {
-            throw new InvalidDataException("新しいバージョンの Trimx で作成されたファイルです。アプリを更新してください。");
+            throw new InvalidDataException(Loc.Get("core.proj.newer"));
         }
 
         if (project.Width is < 1 or > ImageLimits.MaxSide || project.Height is < 1 or > ImageLimits.MaxSide)
         {
-            throw new InvalidDataException("キャンバスサイズが不正です。");
+            throw new InvalidDataException(Loc.Get("core.proj.badcanvas"));
         }
 
         if (project.Layers.Count > MaxLayers)
         {
-            throw new InvalidDataException("レイヤー数が多すぎます。");
+            throw new InvalidDataException(Loc.Get("core.proj.toomanylayers"));
         }
 
         var document = new ImageDocument(project.Width, project.Height, title);
@@ -203,7 +204,7 @@ public static class ProjectFileService
             {
                 Kind = Enum.TryParse<ShapeKind>(dto.Shape, ignoreCase: true, out var kind) && Enum.IsDefined(kind)
                     ? kind
-                    : throw new InvalidDataException("図形の種類が不正です。"),
+                    : throw new InvalidDataException(Loc.Get("core.proj.badshape")),
                 Width = dto.Width ?? 0,
                 Height = dto.Height ?? 0,
                 StrokeColor = ParseColor(dto.StrokeColor, SKColors.Black),
@@ -221,7 +222,7 @@ public static class ProjectFileService
                 ShadowOffsetX = Finite(dto.ShadowOffsetX, IShadowed.DefaultOffset),
                 ShadowOffsetY = Finite(dto.ShadowOffsetY, IShadowed.DefaultOffset),
             },
-            _ => throw new InvalidDataException($"未対応のレイヤー種別です: {dto.Type}"),
+            _ => throw new InvalidDataException(Loc.Get("core.proj.unsupportedlayer", dto.Type)),
         };
 
         layer.Name = dto.Name ?? string.Empty;
@@ -239,7 +240,7 @@ public static class ProjectFileService
         var entry = dto.Image is null ? null : archive.GetEntry(dto.Image);
         if (entry is null)
         {
-            throw new InvalidDataException("画像データが見つかりません。");
+            throw new InvalidDataException(Loc.Get("core.proj.noimage"));
         }
 
         using var stream = new MemoryStream(ReadLimited(entry, MaxImageBytes));
@@ -254,7 +255,7 @@ public static class ProjectFileService
         using var pixmap = bitmap.PeekPixels();
         if (!pixmap.Encode(entryStream, new SKPngEncoderOptions()))
         {
-            throw new IOException("レイヤー画像の保存に失敗しました。");
+            throw new IOException(Loc.Get("core.proj.layersavefail"));
         }
     }
 
@@ -263,7 +264,7 @@ public static class ProjectFileService
     {
         if (entry.Length > maxBytes)
         {
-            throw new InvalidDataException("プロジェクトファイルのデータが大きすぎます。");
+            throw new InvalidDataException(Loc.Get("core.proj.toolarge"));
         }
 
         using var source = entry.Open();
@@ -274,7 +275,7 @@ public static class ProjectFileService
         {
             if (buffer.Length + read > maxBytes)
             {
-                throw new InvalidDataException("プロジェクトファイルのデータが大きすぎます。");
+                throw new InvalidDataException(Loc.Get("core.proj.toolarge"));
             }
 
             buffer.Write(chunk, 0, read);

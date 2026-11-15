@@ -1,6 +1,7 @@
 using SkiaSharp;
 using Trimx.Core.Documents;
 using Trimx.Core.Editing;
+using Trimx.Core.Localization;
 
 namespace Trimx.Core.Commands;
 
@@ -10,8 +11,6 @@ namespace Trimx.Core.Commands;
 /// </summary>
 public static class LayerCommands
 {
-    private const string DefaultTextLayerName = "テキスト";
-
     public static IDocumentCommand SetVisibility(Layer layer, bool isVisible)
     {
         return Property(layer, nameof(Layer.IsVisible), static l => l.IsVisible, static (l, v) => l.IsVisible = v, isVisible);
@@ -155,7 +154,7 @@ public static class LayerCommands
     public static string NameFor(string text)
     {
         var firstLine = text.Split('\n')[0].Trim('\r', ' ');
-        return firstLine.Length > 0 ? firstLine : DefaultTextLayerName;
+        return firstLine.Length > 0 ? firstLine : Loc.Get("common.text");
     }
 
     private static SetLayerPropertyCommand<TLayer, TValue> Property<TLayer, TValue>(

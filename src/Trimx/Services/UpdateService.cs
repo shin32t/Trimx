@@ -20,6 +20,26 @@ public static class UpdateService
 
     private static readonly HttpClient _http = CreateClient();
 
+    /// <summary>
+    /// True while an update is being downloaded or started. The startup (automatic) and the manual flow share
+    /// one staging folder, so only one may run, and the temporary files must not be deleted meanwhile.
+    /// </summary>
+    public static bool IsUpdating { get; private set; }
+
+    /// <summary>Claims the update flow. Returns false if one is already running; call <see cref="EndUpdate"/> when done.</summary>
+    public static bool TryBeginUpdate()
+    {
+        if (IsUpdating)
+        {
+            return false;
+        }
+
+        IsUpdating = true;
+        return true;
+    }
+
+    public static void EndUpdate() => IsUpdating = false;
+
     /// <summary>The folder of the running exe.</summary>
     public static string InstallDirectory { get; } = Path.TrimEndingDirectorySeparator(AppContext.BaseDirectory);
 
@@ -137,6 +157,39 @@ public static class UpdateService
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
             // The next start tries again.
+        }
+    }
+
+    /// <summary>
+    /// Removes what updating leaves behind: the downloaded update and the previous version's files (what <see cref="CleanUp"/>
+    /// removes at startup), both folders that only this app creates. Returns how many bytes that freed.
+    /// </summary>
+    public static long ClearTempFiles()
+    {
+        if (IsUpdating)
+        {
+            // The staging folder is in use.
+            return 0;
+        }
+
+        var before = DirectorySize(DownloadDirectory) + DirectorySize(Path.Combine(InstallDirectory, UpdateApplier.OldFolder));
+        CleanUp();
+        var after = DirectorySize(DownloadDirectory) + DirectorySize(Path.Combine(InstallDirectory, UpdateApplier.OldFolder));
+        return Math.Max(0, before - after);
+    }
+
+    private static long DirectorySize(string path)
+    {
+        try
+        {
+            return Directory.Exists(path)
+                ? new DirectoryInfo(path).EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length)
+                : 0;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Only used to report how much was freed, so an unreadable folder counts as empty.
+            return 0;
         }
     }
 
