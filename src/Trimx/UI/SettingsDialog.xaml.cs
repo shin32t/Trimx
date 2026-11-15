@@ -125,6 +125,14 @@ public partial class SettingsDialog : Window
         SettingsService.Save(settings);
     }
 
+    private bool _isClosed;
+
+    protected override void OnClosed(EventArgs e)
+    {
+        _isClosed = true;
+        base.OnClosed(e);
+    }
+
     /// <summary>Set when the user chose to update after a manual check. The owner starts the update once this dialog is closed.</summary>
     public UpdateInfo? UpdateToApply { get; private set; }
 
@@ -152,6 +160,13 @@ public partial class SettingsDialog : Window
         finally
         {
             CheckUpdateButton.IsEnabled = true;
+        }
+
+        // The dialog can be closed while the check runs. The owner has already read the result by then,
+        // so an answer now could not start the update; drop the result instead of asking.
+        if (_isClosed)
+        {
+            return;
         }
 
         if (update is null)
