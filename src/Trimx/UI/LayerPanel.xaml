@@ -2,10 +2,26 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:ui="clr-namespace:Trimx.UI"
+             xmlns:doc="clr-namespace:Trimx.Core.Documents;assembly=Trimx.Core"
              Background="{DynamicResource PanelBackgroundBrush}"
              Foreground="{DynamicResource ForegroundBrush}">
     <UserControl.Resources>
-        <ui:LayerKindConverter x:Key="LayerKindConverter" />
+        <!-- The kind label of a layer row. Resource references, so it follows a language change. -->
+        <DataTemplate DataType="{x:Type doc:ImageLayer}">
+            <TextBlock FontSize="11"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       Text="{DynamicResource common.image}" />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type doc:TextLayer}">
+            <TextBlock FontSize="11"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       Text="{DynamicResource common.text}" />
+        </DataTemplate>
+        <DataTemplate DataType="{x:Type doc:ShapeLayer}">
+            <TextBlock FontSize="11"
+                       Foreground="{DynamicResource SecondaryForegroundBrush}"
+                       Text="{DynamicResource common.shape}" />
+        </DataTemplate>
 
         <!-- Visibility toggle drawn as an eye (slashed when hidden). It stays a CheckBox so IsChecked and Click work as before. -->
         <Style x:Key="EyeCheckBoxStyle"
@@ -200,9 +216,8 @@
                                         VerticalAlignment="Center">
                                 <TextBlock Text="{Binding Layer.Name}"
                                            TextTrimming="CharacterEllipsis" />
-                                <TextBlock FontSize="11"
-                                           Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                           Text="{Binding Layer, Converter={StaticResource LayerKindConverter}}" />
+                                <ContentControl Focusable="False"
+                                                Content="{Binding Layer}" />
                             </StackPanel>
                         </Grid>
                         <DataTemplate.Triggers>

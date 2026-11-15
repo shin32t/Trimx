@@ -123,7 +123,8 @@ public static class BackupService
             var keep = session.Tabs.Where(entry => entry.HasBackupFile).Select(entry => PathOf(entry.Id)).ToHashSet(StringComparer.OrdinalIgnoreCase);
             foreach (var file in Directory.EnumerateFiles(BackupDirectory, "*" + ProjectFileService.FileExtension))
             {
-                if (!keep.Contains(file))
+                // Only files this app named: a .trimx the user put in the folder is not ours to delete.
+                if (!keep.Contains(file) && IsOwnFile(Path.GetFileName(file)))
                 {
                     File.Delete(file);
                 }
@@ -156,26 +157,16 @@ public static class BackupService
         }
     }
 
-    /// <summary>Deletes every backup. Called on a normal exit, and when nothing needs backing up.</summary>
-    public static void Clear()
-    {
-        try
-        {
-            if (Directory.Exists(BackupDirectory))
-            {
-                Directory.Delete(BackupDirectory, recursive: true);
-            }
-        }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-        {
-            // A leftover backup is only restored once more; not worth failing the exit.
-        }
-    }
+    /// <summary>
+    /// Deletes every backup this app wrote. Called on a normal exit, and when nothing needs backing up.
+    /// A leftover backup is only restored once more, so failures are ignored (see <see cref="ClearFiles"/>).
+    /// </summary>
+    public static void Clear() => ClearFiles();
 
     /// <summary>
     /// Deletes the files this app wrote to the backup folder (the per-tab .trimx files named by a <see cref="DocumentTab.BackupId"/>
     /// and session.json) and returns how many bytes that freed. Anything else in the folder is left alone,
-    /// and the folder is removed only if it ends up empty. Unlike <see cref="Clear"/>, this is for the user's "delete temporary files".
+    /// and the folder is removed only if it ends up empty. Used by <see cref="Clear"/> and by the user's "delete temporary files".
     /// </summary>
     public static long ClearFiles()
     {

@@ -145,6 +145,7 @@
   "settings.reset.confirm": "This clears the remembered colors, widths and so on for the pen, text and shapes, and restores the defaults.\nMy colors and the image size history are kept.",
   "upd.unavailable": "Automatic updates are not available in this environment (a development build, or a folder that cannot be written to).",
   "upd.checking": "Checking…",
+  "upd.busy": "An update is already in progress.",
   "upd.none": "No newer version was found (current: {0}). This is also shown when the network cannot be reached.",
   "upd.found": "Version {0} is available.",
   "upd.ask": "Version {0} is available (current: {1}).\nUpdate now and restart?",

@@ -66,6 +66,24 @@ public partial class MainWindow
     /// <summary>Downloads the update, backs up the tabs, and restarts into the new version.</summary>
     private async Task RunUpdateAsync(UpdateInfo update, bool silentOnError)
     {
+        // The startup update and one chosen in the settings dialog share a staging folder, so never run two.
+        if (!UpdateService.TryBeginUpdate())
+        {
+            return;
+        }
+
+        try
+        {
+            await DownloadAndRestartAsync(update, silentOnError);
+        }
+        finally
+        {
+            UpdateService.EndUpdate();
+        }
+    }
+
+    private async Task DownloadAndRestartAsync(UpdateInfo update, bool silentOnError)
+    {
         var dialog = new UpdateProgressWindow { Owner = this };
         var progress = new Progress<double>(dialog.SetProgress);
         dialog.Show();

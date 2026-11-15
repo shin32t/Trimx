@@ -302,16 +302,14 @@ public partial class MainWindow : Window
     private async void OnSettingsClick(object sender, RoutedEventArgs e)
     {
         var dialog = new SettingsDialog { Owner = this };
+
+        // Clearing the temporary files removed the backups of open tabs too; write them again as usual,
+        // without waiting for the dialog to close (it may stay open).
+        dialog.TempFilesDeleted += (_, _) => ScheduleBackup();
         dialog.ShowDialog();
 
         // "Reset" in the dialog changes the remembered pen.
         LoadPenFromState();
-
-        // Clearing the temporary files removed the backups of open tabs too; they are written again as usual.
-        if (dialog.TempFilesCleared)
-        {
-            ScheduleBackup();
-        }
 
         // Chosen in the dialog after "check for updates"; started here so the dialog is already gone.
         if (dialog.UpdateToApply is { } update)

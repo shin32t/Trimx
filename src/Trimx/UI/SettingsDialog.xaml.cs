@@ -21,7 +21,7 @@ public partial class SettingsDialog : Window
         InitializeComponent();
 
         var settings = SettingsService.Load();
-        switch (settings.Language.ToLowerInvariant())
+        switch (settings.LanguageOrSystem.ToLowerInvariant())
         {
             case Loc.Japanese:
                 LangJaRadio.IsChecked = true;
@@ -130,6 +130,12 @@ public partial class SettingsDialog : Window
 
     private async void OnCheckUpdateClick(object sender, RoutedEventArgs e)
     {
+        if (UpdateService.IsUpdating)
+        {
+            ShowUpdateStatus(Loc.Get("upd.busy"));
+            return;
+        }
+
         if (!UpdateService.CanUpdateThisCopy())
         {
             ShowUpdateStatus(Loc.Get("upd.unavailable"));
@@ -169,11 +175,22 @@ public partial class SettingsDialog : Window
         }
     }
 
-    /// <summary>Set when the temporary files were deleted, so the owner can write the backups of open tabs again.</summary>
-    public bool TempFilesCleared { get; private set; }
+    /// <summary>
+    /// Raised right after the temporary files were deleted, so the owner can write the backups of open tabs again
+    /// at once (this dialog may stay open for a long time).
+    /// </summary>
+    public event EventHandler? TempFilesDeleted;
 
     private void OnClearTempClick(object sender, RoutedEventArgs e)
     {
+        if (UpdateService.IsUpdating)
+        {
+            // The update's staging folder is in use; deleting it now would break the download.
+            TempStatusText.Text = Loc.Get("upd.busy");
+            TempStatusText.Visibility = Visibility.Visible;
+            return;
+        }
+
         var answer = MessageBox.Show(this, Loc.Get("settings.temp.confirm"), "Trimx", MessageBoxButton.OKCancel, MessageBoxImage.Question);
         if (answer != MessageBoxResult.OK)
         {
@@ -182,7 +199,7 @@ public partial class SettingsDialog : Window
 
         // Only files this app created: tab backups and what an update leaves behind.
         var freed = BackupService.ClearFiles() + UpdateService.ClearTempFiles();
-        TempFilesCleared = true;
+        TempFilesDeleted?.Invoke(this, EventArgs.Empty);
 
         TempStatusText.Text = freed > 0 ? Loc.Get("settings.temp.done", FormatSize(freed)) : Loc.Get("settings.temp.none");
         TempStatusText.Visibility = Visibility.Visible;

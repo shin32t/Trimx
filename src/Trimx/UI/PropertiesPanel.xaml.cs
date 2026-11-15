@@ -85,7 +85,8 @@ public partial class PropertiesPanel : UserControl
         ShapeSection.Visibility = shape is not null ? Visibility.Visible : Visibility.Collapsed;
         ShadowSection.Visibility = _layer is IShadowed ? Visibility.Visible : Visibility.Collapsed;
         EmptyText.Visibility = RootPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-        HeaderText.Text = Loc.Get(text is not null ? "props.header.text" : "props.header.shape");
+        // A resource reference (not Loc.Get) so the header follows a language change while the layer stays selected.
+        HeaderText.SetResourceReference(TextBlock.TextProperty, text is not null ? "props.header.text" : "props.header.shape");
 
         UpdateValues();
     }
