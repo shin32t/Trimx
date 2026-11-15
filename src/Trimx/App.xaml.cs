@@ -32,6 +32,7 @@ public partial class App : Application
         var settings = SettingsService.Load();
         UiOptions.Instance.ShowToolbarLabels = settings.ShowToolbarLabels;
         ThemeService.Apply(ThemeService.Parse(settings.Theme));
+        LocalizationService.Apply(settings.Language);
         base.OnStartup(e);
     }
 

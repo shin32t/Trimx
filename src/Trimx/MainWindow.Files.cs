@@ -10,18 +10,20 @@ using Trimx.Core.Rendering;
 using Trimx.Core.Services;
 using Trimx.Services;
 using Trimx.UI;
+using Trimx.Core.Localization;
 
 namespace Trimx;
 
 // File operations: open, save, export, clipboard copy and drag & drop.
 public partial class MainWindow
 {
-    private const string OpenFilter =
-        "Trimx プロジェクトと画像|*.trimx;*.png;*.jpg;*.jpeg;*.webp;*.bmp|" +
-        "Trimx プロジェクト (*.trimx)|*.trimx|" +
-        "画像 (PNG, JPEG, WebP, BMP)|*.png;*.jpg;*.jpeg;*.webp;*.bmp";
+    // Built on each use so the file dialog follows the current language.
+    private static string OpenFilter =>
+        Loc.Get("filter.all") + "|*.trimx;*.png;*.jpg;*.jpeg;*.webp;*.bmp|" +
+        Loc.Get("filter.project") + "|*.trimx|" +
+        Loc.Get("filter.images") + "|*.png;*.jpg;*.jpeg;*.webp;*.bmp";
 
-    private const string ProjectFilter = "Trimx プロジェクト (*.trimx)|*.trimx";
+    private static string ProjectFilter => Loc.Get("filter.project") + "|*.trimx";
 
     // Index (1-based) matches the filter order below.
     private static readonly ExportFormat[] _exportFormatsByFilter = { ExportFormat.Png, ExportFormat.Jpeg, ExportFormat.Webp };
@@ -87,7 +89,7 @@ public partial class MainWindow
         catch (Exception ex)
         {
             // Any failure (missing file, bad format, out of memory) is reported to the user; the app keeps running.
-            ShowError($"「{Path.GetFileName(path)}」を開けませんでした。", ex);
+            ShowError(Loc.Get("err.open", Path.GetFileName(path)), ex);
         }
         finally
         {
@@ -144,7 +146,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            ShowError("プロジェクトを保存できませんでした。", ex);
+            ShowError(Loc.Get("err.save"), ex);
             return false;
         }
         finally
@@ -208,7 +210,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            ShowError("画像を書き出せませんでした。", ex);
+            ShowError(Loc.Get("err.export"), ex);
         }
         finally
         {
@@ -235,7 +237,7 @@ public partial class MainWindow
                 : ExportRenderer.Render(tab.Document, SKColors.Transparent);
             if (!ClipboardService.TrySetImage(bitmap))
             {
-                MessageBox.Show(this, "クリップボードに書き込めませんでした。他のアプリが使用中の可能性があります。", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(this, Loc.Get("err.clipboardbusy"), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
             else
             {
@@ -249,7 +251,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            ShowError("画像をコピーできませんでした。", ex);
+            ShowError(Loc.Get("err.copy"), ex);
         }
         finally
         {
@@ -278,7 +280,7 @@ public partial class MainWindow
             // The clipboard comes first, so a failure there does not lose the pixels.
             if (!ClipboardService.TrySetImage(bitmap))
             {
-                MessageBox.Show(this, "クリップボードに書き込めませんでした。他のアプリが使用中の可能性があります。", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(this, Loc.Get("err.clipboardbusy"), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
                 return;
             }
 
@@ -289,7 +291,7 @@ public partial class MainWindow
         }
         catch (Exception ex)
         {
-            ShowError("切り取れませんでした。", ex);
+            ShowError(Loc.Get("err.cut"), ex);
         }
         finally
         {

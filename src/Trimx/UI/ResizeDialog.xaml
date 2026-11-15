@@ -28,7 +28,7 @@
                        Grid.Column="0"
                        Margin="0,0,10,0"
                        VerticalAlignment="Center"
-                       Text="幅" />
+                       Text="{DynamicResource common.width}" />
             <TextBox x:Name="WidthBox"
                      Grid.Row="0"
                      Grid.Column="1"
@@ -44,7 +44,7 @@
                        Grid.Column="0"
                        Margin="0,0,10,0"
                        VerticalAlignment="Center"
-                       Text="高さ" />
+                       Text="{DynamicResource common.height}" />
             <TextBox x:Name="HeightBox"
                      Grid.Row="1"
                      Grid.Column="1"
@@ -58,14 +58,14 @@
 
         <CheckBox x:Name="KeepRatioCheck"
                   Margin="0,10,0,0"
-                  Content="縦横比を維持" />
+                  Content="{DynamicResource resize.keepratio}" />
 
         <!-- Canvas size only: where the existing content sits in the new canvas -->
         <StackPanel x:Name="AnchorSection"
                     Margin="0,12,0,0"
                     Visibility="Collapsed">
             <TextBlock Margin="0,0,0,4"
-                       Text="元の画像の位置" />
+                       Text="{DynamicResource resize.anchor}" />
             <UniformGrid x:Name="AnchorGrid"
                          Rows="3"
                          Columns="3"
@@ -87,7 +87,7 @@
                     Click="OnOk" />
             <Button MinWidth="80"
                     Margin="8,0,0,0"
-                    Content="キャンセル"
+                    Content="{DynamicResource common.cancel}"
                     IsCancel="True" />
         </StackPanel>
     </StackPanel>

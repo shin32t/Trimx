@@ -1,3 +1,5 @@
+using Trimx.Core.Localization;
+
 namespace Trimx.Core.Updates;
 
 /// <summary>
@@ -24,7 +26,7 @@ public static class UpdateApplier
     {
         if (!File.Exists(Path.Combine(packageDirectory, MainExe)))
         {
-            throw new InvalidDataException($"{MainExe} がパッケージにありません。");
+            throw new InvalidDataException(Loc.Get("core.applier.noexe", MainExe));
         }
 
         var oldDirectory = Path.Combine(installDirectory, OldFolder);

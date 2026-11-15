@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows;
 using System.Windows.Controls;
+using Trimx.Core.Localization;
 
 namespace Trimx.UI;
 
@@ -18,8 +19,8 @@ public partial class ResizeDialog : Window
     public ResizeDialog(bool isCanvasSize, int currentWidth, int currentHeight)
     {
         InitializeComponent();
-        Title = isCanvasSize ? "キャンバスサイズ" : "画像サイズ";
-        CurrentSizeText.Text = $"現在: {currentWidth} × {currentHeight} px";
+        Title = Loc.Get(isCanvasSize ? "resize.canvastitle" : "common.imagesize");
+        CurrentSizeText.Text = Loc.Get("resize.current", currentWidth, currentHeight);
         _ratio = currentWidth / (double)currentHeight;
 
         // Resampling an image should stay proportional by default; canvas edits usually should not.
@@ -95,7 +96,7 @@ public partial class ResizeDialog : Window
     {
         if (!TryParse(WidthBox.Text, out var width) || !TryParse(HeightBox.Text, out var height))
         {
-            ErrorText.Text = $"幅と高さは 1～{NewImageDialog.MaxSize} の整数で入力してください。";
+            ErrorText.Text = Loc.Get("err.sizeinput", NewImageDialog.MaxSize);
             ErrorText.Visibility = Visibility.Visible;
             return;
         }

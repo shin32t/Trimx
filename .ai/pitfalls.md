@@ -10,6 +10,8 @@
 - **Load the font list on first display.** Loading it at startup slows startup.
 - **Overwriting settings.** Handle `TrimxSetting.json` as "reload, modify, save". Store `AppSettings.Theme` as a string so a typo from hand-editing cannot make the whole file unreadable.
 
+- **Localized text.** A key missing from `en.json` silently shows the Japanese text (and a key missing from both shows the key itself), so add both files together. Use `{DynamicResource}` (not `StaticResource`) for text in XAML or a language change will not reach it. Text that code sets once (not through a command or `Loc.Changed`) stays in the old language until it is set again.
+
 ## Verifying on a real screen (Windows)
 
 - Launch the app as `dotnet <temp folder>\Debug\net10.0-windows10.0.19041.0\Trimx.dll`, not as the exe (an exe in a temp folder may be refused execution).

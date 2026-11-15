@@ -4,6 +4,7 @@ using System.Windows;
 using Trimx.Core.Updates;
 using Trimx.Services;
 using Trimx.UI;
+using Trimx.Core.Localization;
 
 namespace Trimx;
 
@@ -20,8 +21,8 @@ public partial class MainWindow
     {
         UpdateButton.Visibility = updateAvailable || DebugMode.IsEnabled ? Visibility.Visible : Visibility.Collapsed;
         UpdateButton.ToolTip = updateAvailable && _pendingUpdate is { } update
-            ? $"新しいバージョン {update.Version} に更新して再起動します"
-            : "デバッグモード: 更新はありません";
+            ? Loc.Get("upd.tip.available", update.Version)
+            : Loc.Get("upd.tip.debug");
     }
 
     /// <summary>
@@ -55,7 +56,7 @@ public partial class MainWindow
     {
         if (_pendingUpdate is not { } update)
         {
-            MessageBox.Show(this, "デバッグモード: 更新はありません。", "Trimx", MessageBoxButton.OK, MessageBoxImage.Information);
+            MessageBox.Show(this, Loc.Get("upd.msg.debug"), "Trimx", MessageBoxButton.OK, MessageBoxImage.Information);
             return;
         }
 
@@ -83,7 +84,7 @@ public partial class MainWindow
         {
             if (!silentOnError)
             {
-                MessageBox.Show(this, $"更新をダウンロードできませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(this, Loc.Get("err.updatedownload", ex.Message), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             return;
@@ -104,7 +105,7 @@ public partial class MainWindow
         {
             if (!silentOnError)
             {
-                MessageBox.Show(this, $"更新を開始できませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show(this, Loc.Get("err.updatestart", ex.Message), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
             }
 
             return;

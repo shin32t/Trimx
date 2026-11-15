@@ -1,7 +1,7 @@
 <Window x:Class="Trimx.UI.NewImageDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="新規画像"
+        Title="{DynamicResource newimage.title}"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
@@ -25,7 +25,7 @@
                        Grid.Column="0"
                        Margin="0,0,10,0"
                        VerticalAlignment="Center"
-                       Text="幅" />
+                       Text="{DynamicResource common.width}" />
             <TextBox x:Name="WidthBox"
                      Grid.Row="0"
                      Grid.Column="1"
@@ -40,7 +40,7 @@
                        Grid.Column="0"
                        Margin="0,0,10,0"
                        VerticalAlignment="Center"
-                       Text="高さ" />
+                       Text="{DynamicResource common.height}" />
             <TextBox x:Name="HeightBox"
                      Grid.Row="1"
                      Grid.Column="1" />
@@ -52,17 +52,17 @@
         </Grid>
 
         <TextBlock Margin="0,14,0,4"
-                   Text="背景" />
+                   Text="{DynamicResource common.background}" />
         <StackPanel Orientation="Horizontal">
             <RadioButton x:Name="TransparentRadio"
                          Margin="0,0,14,0"
-                         Content="透明"
+                         Content="{DynamicResource newimage.transparent}"
                          IsChecked="True" />
             <RadioButton x:Name="WhiteRadio"
                          Margin="0,0,14,0"
-                         Content="白" />
+                         Content="{DynamicResource newimage.white}" />
             <RadioButton x:Name="BlackRadio"
-                         Content="黒" />
+                         Content="{DynamicResource newimage.black}" />
         </StackPanel>
 
         <TextBlock x:Name="ErrorText"
@@ -75,12 +75,12 @@
                     HorizontalAlignment="Right"
                     Orientation="Horizontal">
             <Button MinWidth="80"
-                    Content="作成"
+                    Content="{DynamicResource newimage.create}"
                     IsDefault="True"
                     Click="OnOk" />
             <Button MinWidth="80"
                     Margin="8,0,0,0"
-                    Content="キャンセル"
+                    Content="{DynamicResource common.cancel}"
                     IsCancel="True" />
         </StackPanel>
     </StackPanel>

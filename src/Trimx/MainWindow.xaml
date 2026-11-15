@@ -102,23 +102,23 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal" HorizontalAlignment="Left">
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE8A5;"
-                            Content="新規"
-                            ToolTip="新規 (Ctrl+N)"
+                            Content="{DynamicResource common.new}"
+                            ToolTip="{DynamicResource tb.new.tip}"
                             Command="{x:Static ApplicationCommands.New}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xED25;"
-                            Content="開く"
-                            ToolTip="開く: プロジェクトまたは画像 (Ctrl+O)"
+                            Content="{DynamicResource common.open}"
+                            ToolTip="{DynamicResource tb.open.tip}"
                             Command="{x:Static ApplicationCommands.Open}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE74E;"
-                            Content="保存"
-                            ToolTip="保存: プロジェクト (Ctrl+S / 名前を付けて保存: Ctrl+Shift+S)"
+                            Content="{DynamicResource common.save}"
+                            ToolTip="{DynamicResource tb.save.tip}"
                             Command="{x:Static ApplicationCommands.Save}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xEE71;"
-                            Content="書き出し"
-                            ToolTip="書き出し: PNG / JPEG / WebP (Ctrl+E)"
+                            Content="{DynamicResource common.export}"
+                            ToolTip="{DynamicResource tb.export.tip}"
                             Command="{x:Static ui:EditorCommands.Export}" />
                 </StackPanel>
                 <StackPanel Grid.Column="1" Orientation="Horizontal" HorizontalAlignment="Center">
@@ -129,8 +129,8 @@
                         <Button x:Name="PenButton"
                                 Style="{StaticResource ToolBarButtonStyle}"
                                 Tag="&#xE70F;"
-                                Content="ペン"
-                                ToolTip="ペン: 描く (Esc で終了)"
+                                Content="{DynamicResource common.pen}"
+                                ToolTip="{DynamicResource tb.pen.tip}"
                                 Click="OnPenButtonClick" />
                     </Border>
                     <Popup x:Name="PenPopup"
@@ -146,27 +146,27 @@
                             <StackPanel>
                                 <TextBlock FontWeight="SemiBold"
                                            Foreground="{DynamicResource ForegroundBrush}"
-                                           Text="色" />
+                                           Text="{DynamicResource pen.color}" />
                                 <UniformGrid x:Name="PenColorGrid"
                                              Margin="0,8,0,0"
                                              Columns="6" />
                                 <TextBlock Margin="0,10,0,0"
                                            Foreground="{DynamicResource SecondaryForegroundBrush}"
-                                           Text="マイカラー (「その他の色…」で選んだ色)" />
+                                           Text="{DynamicResource pen.mycolors}" />
                                 <StackPanel x:Name="MyColorPanel"
                                             Margin="0,4,0,0"
                                             Orientation="Horizontal" />
                                 <Button x:Name="PenCustomButton"
                                         Margin="0,8,0,0"
                                         Cursor="Hand"
-                                        Content="その他の色…"
-                                        ToolTip="カラーピッカーで細かく色を選ぶ"
+                                        Content="{DynamicResource pen.more}"
+                                        ToolTip="{DynamicResource pen.more.tip}"
                                         Click="OnPenCustomClick" />
 
                                 <TextBlock Margin="0,14,0,0"
                                            FontWeight="SemiBold"
                                            Foreground="{DynamicResource ForegroundBrush}"
-                                           Text="サイズ" />
+                                           Text="{DynamicResource common.size}" />
                                 <Border Height="64"
                                         Margin="0,6,0,0"
                                         ClipToBounds="True"
@@ -186,7 +186,7 @@
                                            HorizontalAlignment="Right"
                                            Foreground="{DynamicResource SecondaryForegroundBrush}" />
                                 <Button Margin="0,10,0,0"
-                                        Content="ペンをやめる"
+                                        Content="{DynamicResource pen.stop}"
                                         Click="OnPenStopClick" />
                             </StackPanel>
                         </Border>
@@ -195,8 +195,8 @@
                     <Button x:Name="ShapeMenuButton"
                             Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE739;"
-                            Content="図形"
-                            ToolTip="図形: 種類を選んで追加"
+                            Content="{DynamicResource common.shape}"
+                            ToolTip="{DynamicResource tb.shape.tip}"
                             Click="OnShapeMenuButtonClick" />
                     <Popup x:Name="ShapePopup"
                            PlacementTarget="{Binding ElementName=ShapeMenuButton}"
@@ -210,29 +210,29 @@
                             <StackPanel Orientation="Horizontal">
                                 <Button Style="{StaticResource ToolBarButtonStyle}"
                                         Tag="&#xE739;"
-                                        Content="矩形"
-                                        ToolTip="矩形を追加"
+                                        Content="{DynamicResource shape.rect}"
+                                        ToolTip="{DynamicResource shape.rect.tip}"
                                         Command="{x:Static ui:EditorCommands.AddShape}"
                                         CommandParameter="{x:Static core:ShapeKind.Rectangle}"
                                         Click="OnShapeChosen" />
                                 <Button Style="{StaticResource ToolBarButtonStyle}"
                                         Tag="&#xEA3A;"
-                                        Content="楕円"
-                                        ToolTip="楕円を追加"
+                                        Content="{DynamicResource shape.ellipse}"
+                                        ToolTip="{DynamicResource shape.ellipse.tip}"
                                         Command="{x:Static ui:EditorCommands.AddShape}"
                                         CommandParameter="{x:Static core:ShapeKind.Ellipse}"
                                         Click="OnShapeChosen" />
                                 <Button Style="{StaticResource ToolBarButtonStyle}"
                                         Tag="&#xE738;"
-                                        Content="線"
-                                        ToolTip="線を追加"
+                                        Content="{DynamicResource shape.line}"
+                                        ToolTip="{DynamicResource shape.line.tip}"
                                         Command="{x:Static ui:EditorCommands.AddShape}"
                                         CommandParameter="{x:Static core:ShapeKind.Line}"
                                         Click="OnShapeChosen" />
                                 <Button Style="{StaticResource ToolBarButtonStyle}"
                                         Tag="&#xEDE1;"
-                                        Content="矢印"
-                                        ToolTip="矢印を追加"
+                                        Content="{DynamicResource shape.arrow}"
+                                        ToolTip="{DynamicResource shape.arrow.tip}"
                                         Command="{x:Static ui:EditorCommands.AddShape}"
                                         CommandParameter="{x:Static core:ShapeKind.Arrow}"
                                         Click="OnShapeChosen" />
@@ -241,16 +241,16 @@
                     </Popup>
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE8D2;"
-                            Content="テキスト"
-                            ToolTip="テキスト: レイヤーを追加"
+                            Content="{DynamicResource common.text}"
+                            ToolTip="{DynamicResource tb.text.tip}"
                             Command="{x:Static ui:EditorCommands.AddText}" />
                     <Border Width="1"
                             Margin="6,4"
                             Background="{DynamicResource BorderBrush}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE8C6;"
-                            Content="切り取り"
-                            ToolTip="切り取り: 選択範囲を選択中の画像レイヤーからコピーして消す (Ctrl+X)"
+                            Content="{DynamicResource tb.cut}"
+                            ToolTip="{DynamicResource tb.cut.tip}"
                             Command="{x:Static ApplicationCommands.Cut}" />
                     <Border x:Name="SelectButtonHost"
                             CornerRadius="4"
@@ -258,68 +258,68 @@
                         <Button x:Name="SelectButton"
                                 Style="{StaticResource ToolBarButtonStyle}"
                                 Tag="&#xE799;"
-                                Content="範囲選択"
-                                ToolTip="範囲選択: ドラッグで範囲を選ぶ (Esc で解除)"
+                                Content="{DynamicResource tb.select}"
+                                ToolTip="{DynamicResource tb.select.tip}"
                                 Click="OnSelectButtonClick" />
                     </Border>
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE7A8;"
-                            Content="切り抜き"
-                            ToolTip="切り抜き: キャンバスを選択範囲の大きさにする"
+                            Content="{DynamicResource common.crop}"
+                            ToolTip="{DynamicResource tb.crop.tip}"
                             Command="{x:Static ui:EditorCommands.Crop}" />
                     <Border Width="1"
                             Margin="6,4"
                             Background="{DynamicResource BorderBrush}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xEE47;"
-                            Content="キャンバス"
-                            ToolTip="キャンバスサイズ: 変更 (画像は拡大縮小しない)"
+                            Content="{DynamicResource tb.canvas}"
+                            ToolTip="{DynamicResource tb.canvas.tip}"
                             Command="{x:Static ui:EditorCommands.ResizeCanvas}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE740;"
-                            Content="画像サイズ"
-                            ToolTip="画像サイズ: 画像全体を拡大縮小"
+                            Content="{DynamicResource common.imagesize}"
+                            ToolTip="{DynamicResource tb.imagesize.tip}"
                             Command="{x:Static ui:EditorCommands.ResizeImage}" />
                     <Border Width="1"
                             Margin="6,4"
                             Background="{DynamicResource BorderBrush}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE9A6;"
-                            Content="フィット"
-                            ToolTip="フィット: 画面に合わせる (Ctrl+0)"
+                            Content="{DynamicResource tb.fit}"
+                            ToolTip="{DynamicResource tb.fit.tip}"
                             Command="{x:Static ui:EditorCommands.FitToView}" />
                     <Border Width="1"
                             Margin="6,4"
                             Background="{DynamicResource BorderBrush}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE7A7;"
-                            Content="元に戻す"
-                            ToolTip="元に戻す (Ctrl+Z)"
+                            Content="{DynamicResource tb.undo}"
+                            ToolTip="{DynamicResource tb.undo.tip}"
                             Command="{x:Static ApplicationCommands.Undo}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE7A6;"
-                            Content="やり直し"
-                            ToolTip="やり直し (Ctrl+Y)"
+                            Content="{DynamicResource tb.redo}"
+                            ToolTip="{DynamicResource tb.redo.tip}"
                             Command="{x:Static ApplicationCommands.Redo}" />
                 </StackPanel>
                 <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE77F;"
-                            Content="貼り付け"
-                            ToolTip="貼り付け: クリップボードの画像 (Ctrl+V)"
+                            Content="{DynamicResource tb.paste}"
+                            ToolTip="{DynamicResource tb.paste.tip}"
                             Command="{x:Static ApplicationCommands.Paste}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE8C8;"
-                            Content="コピー"
-                            ToolTip="コピー: 編集結果をクリップボードへ。範囲選択中は、選択レイヤーの選択範囲だけ (Ctrl+C)"
+                            Content="{DynamicResource common.copy}"
+                            ToolTip="{DynamicResource tb.copy.tip}"
                             Command="{x:Static ApplicationCommands.Copy}" />
                     <Border Width="1"
                             Margin="6,4"
                             Background="{DynamicResource BorderBrush}" />
                     <Button Style="{StaticResource ToolBarButtonStyle}"
                             Tag="&#xE713;"
-                            Content="設定"
-                            ToolTip="設定: テーマ・ツールバーの表示など"
+                            Content="{DynamicResource common.settings}"
+                            ToolTip="{DynamicResource tb.settings.tip}"
                             Click="OnSettingsClick" />
                     <!-- Shown when a newer version exists (or in debug mode); see MainWindow.Update.cs. -->
                     <Button x:Name="UpdateButton"
@@ -339,7 +339,7 @@
                                        Text="&#xE896;" />
                             <TextBlock Margin="6,0,0,0"
                                        VerticalAlignment="Center"
-                                       Text="更新" />
+                                       Text="{DynamicResource update.label}" />
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -359,7 +359,7 @@
                         <Button Margin="8,0,0,0"
                                 Style="{StaticResource TabCloseButtonStyle}"
                                 Content="×"
-                                ToolTip="閉じる"
+                                ToolTip="{DynamicResource common.close}"
                                 Command="{x:Static ui:EditorCommands.CloseTab}"
                                 CommandParameter="{Binding}" />
                     </StackPanel>
@@ -388,7 +388,7 @@
                        IsHitTestVisible="False"
                        Foreground="{DynamicResource SecondaryForegroundBrush}"
                        TextAlignment="Center"
-                       Text="Ctrl+V でクリップボードの画像を開く&#x0a;Ctrl+N で新規画像を作成" />
+                       Text="{DynamicResource main.empty}" />
 
             <!-- Drag to change the width of the side panel (the canvas takes the rest). -->
             <GridSplitter Grid.Column="1"
@@ -399,7 +399,7 @@
                           ResizeDirection="Columns"
                           ResizeBehavior="PreviousAndNext"
                           DragCompleted="OnSidePanelSplitterDragCompleted"
-                          ToolTip="ドラッグして幅を変更" />
+                          ToolTip="{DynamicResource main.splitter.width.tip}" />
 
             <Border Grid.Column="2"
                     Background="{DynamicResource PanelBackgroundBrush}">
@@ -426,7 +426,7 @@
                                   ResizeDirection="Rows"
                                   ResizeBehavior="PreviousAndNext"
                                   DragCompleted="OnInspectorSplitterDragCompleted"
-                                  ToolTip="ドラッグして高さを変更" />
+                                  ToolTip="{DynamicResource main.splitter.height.tip}" />
                     <ui:LayerPanel x:Name="LayerPanel"
                                    Grid.Row="2" />
                 </Grid>
@@ -442,7 +442,7 @@
                 <Button x:Name="ZoomButton"
                         Style="{StaticResource TabCloseButtonStyle}"
                         Padding="10,3"
-                        ToolTip="表示倍率 (クリックで倍率を選択)"
+                        ToolTip="{DynamicResource zoom.tip}"
                         Click="OnZoomButtonClick">
                     <TextBlock x:Name="ZoomText"
                                MinWidth="40"
@@ -465,13 +465,13 @@
                             <ListBoxItem Tag="2"
                                          Content="200%" />
                             <ListBoxItem Tag="1"
-                                         Content="100% (等倍)" />
+                                         Content="{DynamicResource zoom.actual}" />
                             <ListBoxItem Tag="0.5"
                                          Content="50%" />
                             <ListBoxItem Tag="0.25"
                                          Content="25%" />
                             <ListBoxItem Tag="fit"
-                                         Content="画面に合わせる" />
+                                         Content="{DynamicResource zoom.fit}" />
                         </ListBox>
                     </Border>
                 </Popup>

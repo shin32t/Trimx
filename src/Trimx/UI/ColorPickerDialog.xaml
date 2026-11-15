@@ -1,7 +1,7 @@
 <Window x:Class="Trimx.UI.ColorPickerDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="カラーピッカー"
+        Title="{DynamicResource picker.title}"
         SizeToContent="WidthAndHeight"
         ResizeMode="NoResize"
         ShowInTaskbar="False"
@@ -97,7 +97,7 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               Text="新しい色" />
+                               Text="{DynamicResource picker.new}" />
                     <Border x:Name="NewSwatch"
                             Height="40"
                             BorderBrush="{DynamicResource BorderBrush}"
@@ -106,7 +106,7 @@
                 <StackPanel Grid.Column="1"
                             Margin="8,0,0,0">
                     <TextBlock Foreground="{DynamicResource SecondaryForegroundBrush}"
-                               Text="現在の色" />
+                               Text="{DynamicResource picker.current}" />
                     <Border x:Name="OldSwatch"
                             Height="40"
                             BorderBrush="{DynamicResource BorderBrush}"
@@ -125,7 +125,7 @@
                                    Text="H" />
                         <TextBox x:Name="HueBox"
                                  Style="{StaticResource ValueBoxStyle}"
-                                 ToolTip="色相 (0-360)"
+                                 ToolTip="{DynamicResource picker.hue}"
                                  TextChanged="OnHsvBoxChanged" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
@@ -133,7 +133,7 @@
                                    Text="S" />
                         <TextBox x:Name="SaturationBox"
                                  Style="{StaticResource ValueBoxStyle}"
-                                 ToolTip="彩度 (0-100)"
+                                 ToolTip="{DynamicResource picker.sat}"
                                  TextChanged="OnHsvBoxChanged" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
@@ -141,7 +141,7 @@
                                    Text="B" />
                         <TextBox x:Name="ValueBox"
                                  Style="{StaticResource ValueBoxStyle}"
-                                 ToolTip="明るさ (0-100)"
+                                 ToolTip="{DynamicResource picker.val}"
                                  TextChanged="OnHsvBoxChanged" />
                     </StackPanel>
                 </StackPanel>
@@ -151,7 +151,7 @@
                                    Text="R" />
                         <TextBox x:Name="RedBox"
                                  Style="{StaticResource ValueBoxStyle}"
-                                 ToolTip="赤 (0-255)"
+                                 ToolTip="{DynamicResource picker.red}"
                                  TextChanged="OnRgbBoxChanged" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
@@ -159,7 +159,7 @@
                                    Text="G" />
                         <TextBox x:Name="GreenBox"
                                  Style="{StaticResource ValueBoxStyle}"
-                                 ToolTip="緑 (0-255)"
+                                 ToolTip="{DynamicResource picker.green}"
                                  TextChanged="OnRgbBoxChanged" />
                     </StackPanel>
                     <StackPanel Orientation="Horizontal">
@@ -167,7 +167,7 @@
                                    Text="B" />
                         <TextBox x:Name="BlueBox"
                                  Style="{StaticResource ValueBoxStyle}"
-                                 ToolTip="青 (0-255)"
+                                 ToolTip="{DynamicResource picker.blue}"
                                  TextChanged="OnRgbBoxChanged" />
                     </StackPanel>
                 </StackPanel>
@@ -188,7 +188,7 @@
                         IsDefault="True"
                         Click="OnOk" />
                 <Button Margin="0,8,0,0"
-                        Content="キャンセル"
+                        Content="{DynamicResource common.cancel}"
                         IsCancel="True" />
             </StackPanel>
         </StackPanel>

@@ -2,6 +2,7 @@ using System.Globalization;
 using System.Windows;
 using Trimx.Core.Documents;
 using Trimx.Core.Editing;
+using Trimx.Core.Localization;
 
 namespace Trimx.UI;
 
@@ -35,7 +36,7 @@ public partial class NewImageDialog : Window
     {
         if (!TryParseSize(WidthBox.Text, out var width) || !TryParseSize(HeightBox.Text, out var height))
         {
-            ErrorText.Text = $"幅と高さは 1～{MaxSize} の整数で入力してください。";
+            ErrorText.Text = Loc.Get("err.sizeinput", MaxSize);
             ErrorText.Visibility = Visibility.Visible;
             return;
         }

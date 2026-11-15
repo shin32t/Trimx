@@ -6,6 +6,7 @@ using Trimx.Core.Documents;
 using Trimx.Core.Editing;
 using Trimx.Services;
 using Trimx.UI;
+using Trimx.Core.Localization;
 
 namespace Trimx;
 
@@ -179,13 +180,13 @@ public partial class MainWindow : Window
                 dialog.ImageWidth,
                 dialog.ImageHeight,
                 dialog.SelectedBackground,
-                $"無題 {++_untitledTabCount}",
-                "背景");
+                Loc.Get("doc.untitled", ++_untitledTabCount),
+                Loc.Get("common.background"));
         }
         catch (Exception ex)
         {
             // Typically a failed pixel allocation for a very large canvas.
-            MessageBox.Show(this, $"画像を作成できませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Loc.Get("err.createimage", ex.Message), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
             return;
         }
 
@@ -210,7 +211,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        tab.AddLayerAboveSelection(LayerFactory.CreateImage(tab.Document, bitmap, "貼り付け"));
+        tab.AddLayerAboveSelection(LayerFactory.CreateImage(tab.Document, bitmap, Loc.Get("layer.pasted")));
     }
 
     private void OnFitToView(object sender, ExecutedRoutedEventArgs e) => Canvas.FitToView();
@@ -298,12 +299,27 @@ public partial class MainWindow : Window
         StateService.MarkChanged();
     }
 
-    private void OnSettingsClick(object sender, RoutedEventArgs e)
+    private async void OnSettingsClick(object sender, RoutedEventArgs e)
     {
-        new SettingsDialog { Owner = this }.ShowDialog();
+        var dialog = new SettingsDialog { Owner = this };
+        dialog.ShowDialog();
 
         // "Reset" in the dialog changes the remembered pen.
         LoadPenFromState();
+
+        // Clearing the temporary files removed the backups of open tabs too; they are written again as usual.
+        if (dialog.TempFilesCleared)
+        {
+            ScheduleBackup();
+        }
+
+        // Chosen in the dialog after "check for updates"; started here so the dialog is already gone.
+        if (dialog.UpdateToApply is { } update)
+        {
+            _pendingUpdate = update;
+            ShowUpdateButton(updateAvailable: true);
+            await RunUpdateAsync(update, silentOnError: false);
+        }
     }
 
     private void CanCrop(object sender, CanExecuteRoutedEventArgs e)
@@ -323,7 +339,7 @@ public partial class MainWindow : Window
         catch (Exception ex) when (ex is InvalidOperationException or OutOfMemoryException)
         {
             // Typically a failed pixel allocation; nothing was changed.
-            MessageBox.Show(this, $"切り抜けませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Loc.Get("err.crop", ex.Message), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
@@ -391,7 +407,7 @@ public partial class MainWindow : Window
         {
             // Typically a failed pixel allocation for a very large result; the command rolls back nothing
             // because it is only created (not executed) when allocation fails.
-            MessageBox.Show(this, $"画像サイズを変更できませんでした。\n{ex.Message}", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Loc.Get("err.resizeimage", ex.Message), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
     }
 
@@ -408,10 +424,10 @@ public partial class MainWindow : Window
         LeavePenMode();
         if (ActiveTab is { } tab)
         {
-            var label = SettingsService.Load().DefaultTextLabel;
+            var label = SettingsService.Load().GetDefaultTextLabel();
             if (string.IsNullOrWhiteSpace(label))
             {
-                label = AppSettings.DefaultTextLabelFallback;
+                label = Loc.Get("common.text");
             }
 
             tab.AddLayerAboveSelection(LayerFactory.CreateText(tab.Document, label, StateService.ApplyText));
@@ -429,10 +445,10 @@ public partial class MainWindow : Window
 
         var name = kind switch
         {
-            ShapeKind.Ellipse => "楕円",
-            ShapeKind.Arrow => "矢印",
-            ShapeKind.Line => "線",
-            _ => "矩形",
+            ShapeKind.Ellipse => Loc.Get("shape.ellipse"),
+            ShapeKind.Arrow => Loc.Get("shape.arrow"),
+            ShapeKind.Line => Loc.Get("shape.line"),
+            _ => Loc.Get("shape.rect"),
         };
         tab.AddLayerAboveSelection(LayerFactory.CreateShape(tab.Document, kind, name, shape => StateService.ApplyShape(shape, tab.Document.Width, tab.Document.Height)));
     }
@@ -475,7 +491,7 @@ public partial class MainWindow : Window
             return;
         }
 
-        AddTab(DocumentFactory.CreateFromImage(bitmap, $"クリップボード {++_clipboardTabCount}", "クリップボード"));
+        AddTab(DocumentFactory.CreateFromImage(bitmap, Loc.Get("doc.clipboard", ++_clipboardTabCount), Loc.Get("layer.clipboard")));
     }
 
     private DocumentTab AddTab(ImageDocument document)
@@ -504,7 +520,7 @@ public partial class MainWindow : Window
         TabStrip.SelectedItem = tab;
         var result = MessageBox.Show(
             this,
-            $"「{tab.Title}」への変更は保存されていません。保存しますか？\n（書き出しやコピーをした後の変更のみが対象です）",
+            Loc.Get("msg.unsaved", tab.Title),
             "Trimx",
             MessageBoxButton.YesNoCancel,
             MessageBoxImage.Warning);

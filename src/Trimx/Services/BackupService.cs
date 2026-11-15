@@ -172,5 +172,63 @@ public static class BackupService
         }
     }
 
+    /// <summary>
+    /// Deletes the files this app wrote to the backup folder (the per-tab .trimx files named by a <see cref="DocumentTab.BackupId"/>
+    /// and session.json) and returns how many bytes that freed. Anything else in the folder is left alone,
+    /// and the folder is removed only if it ends up empty. Unlike <see cref="Clear"/>, this is for the user's "delete temporary files".
+    /// </summary>
+    public static long ClearFiles()
+    {
+        long freed = 0;
+        try
+        {
+            if (!Directory.Exists(BackupDirectory))
+            {
+                return 0;
+            }
+
+            foreach (var file in Directory.EnumerateFiles(BackupDirectory))
+            {
+                if (!IsOwnFile(Path.GetFileName(file)))
+                {
+                    continue;
+                }
+
+                try
+                {
+                    var length = new FileInfo(file).Length;
+                    File.Delete(file);
+                    freed += length;
+                }
+                catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+                {
+                    // In use or locked: leave it; it is only disk space.
+                }
+            }
+
+            if (!Directory.EnumerateFileSystemEntries(BackupDirectory).Any())
+            {
+                Directory.Delete(BackupDirectory);
+            }
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Reporting what was freed so far is enough.
+        }
+
+        return freed;
+    }
+
+    private static bool IsOwnFile(string name)
+    {
+        if (name.Equals(ManifestName, StringComparison.OrdinalIgnoreCase) || name.Equals(ManifestName + ".tmp", StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return name.EndsWith(ProjectFileService.FileExtension, StringComparison.OrdinalIgnoreCase)
+            && Guid.TryParseExact(Path.GetFileNameWithoutExtension(name), "N", out _);
+    }
+
     private static bool NeedsBackup(DocumentTab tab) => tab.IsModified || tab.FilePath is null;
 }

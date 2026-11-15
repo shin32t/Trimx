@@ -140,6 +140,33 @@ public static class UpdateService
         }
     }
 
+    /// <summary>
+    /// Removes what updating leaves behind: the downloaded update and the previous version's files (what <see cref="CleanUp"/>
+    /// removes at startup), both folders that only this app creates. Returns how many bytes that freed.
+    /// </summary>
+    public static long ClearTempFiles()
+    {
+        var before = DirectorySize(DownloadDirectory) + DirectorySize(Path.Combine(InstallDirectory, UpdateApplier.OldFolder));
+        CleanUp();
+        var after = DirectorySize(DownloadDirectory) + DirectorySize(Path.Combine(InstallDirectory, UpdateApplier.OldFolder));
+        return Math.Max(0, before - after);
+    }
+
+    private static long DirectorySize(string path)
+    {
+        try
+        {
+            return Directory.Exists(path)
+                ? new DirectoryInfo(path).EnumerateFiles("*", SearchOption.AllDirectories).Sum(file => file.Length)
+                : 0;
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        {
+            // Only used to report how much was freed, so an unreadable folder counts as empty.
+            return 0;
+        }
+    }
+
     private static string? ValueOf(string[] args, string name)
     {
         var index = Array.IndexOf(args, name);

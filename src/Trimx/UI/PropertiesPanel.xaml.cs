@@ -8,6 +8,7 @@ using SkiaSharp;
 using Trimx.Core.Commands;
 using Trimx.Core.Documents;
 using Trimx.Services;
+using Trimx.Core.Localization;
 
 namespace Trimx.UI;
 
@@ -84,7 +85,7 @@ public partial class PropertiesPanel : UserControl
         ShapeSection.Visibility = shape is not null ? Visibility.Visible : Visibility.Collapsed;
         ShadowSection.Visibility = _layer is IShadowed ? Visibility.Visible : Visibility.Collapsed;
         EmptyText.Visibility = RootPanel.Visibility == Visibility.Visible ? Visibility.Collapsed : Visibility.Visible;
-        HeaderText.Text = text is not null ? "テキストの設定" : "図形の設定";
+        HeaderText.Text = Loc.Get(text is not null ? "props.header.text" : "props.header.shape");
 
         UpdateValues();
     }

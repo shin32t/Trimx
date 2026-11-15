@@ -1,5 +1,6 @@
 using System.IO.Compression;
 using System.Security.Cryptography;
+using Trimx.Core.Localization;
 
 namespace Trimx.Core.Updates;
 
@@ -52,7 +53,7 @@ public static class UpdateDownloader
                 total += read;
                 if (total > info.Size)
                 {
-                    throw new InvalidDataException("ダウンロードしたファイルが、公開されているサイズより大きいです。");
+                    throw new InvalidDataException(Loc.Get("core.dl.toolarge"));
                 }
 
                 hash.AppendData(buffer, 0, read);
@@ -62,13 +63,13 @@ public static class UpdateDownloader
 
             if (total != info.Size)
             {
-                throw new InvalidDataException("ダウンロードしたファイルのサイズが、公開されているものと違います。");
+                throw new InvalidDataException(Loc.Get("core.dl.sizemismatch"));
             }
         }
 
         if (!Convert.ToHexString(hash.GetHashAndReset()).Equals(info.Sha256, StringComparison.OrdinalIgnoreCase))
         {
-            throw new InvalidDataException("ダウンロードしたファイルのハッシュ値が、公開されているものと一致しません。");
+            throw new InvalidDataException(Loc.Get("core.dl.hashmismatch"));
         }
     }
 
@@ -86,7 +87,7 @@ public static class UpdateDownloader
 
         if (declared > MaxUnpackedBytes)
         {
-            throw new InvalidDataException("展開後のサイズが大きすぎます。");
+            throw new InvalidDataException(Loc.Get("core.dl.extracttoolarge"));
         }
 
         long written = 0;
@@ -96,7 +97,7 @@ public static class UpdateDownloader
             var destination = Path.GetFullPath(Path.Combine(targetDirectory, entry.FullName));
             if (!destination.StartsWith(root, StringComparison.OrdinalIgnoreCase))
             {
-                throw new InvalidDataException("zip に不正なパスが含まれています。");
+                throw new InvalidDataException(Loc.Get("core.dl.badpath"));
             }
 
             if (entry.FullName.EndsWith('/') || entry.FullName.EndsWith('\\'))
@@ -115,7 +116,7 @@ public static class UpdateDownloader
                 written += read;
                 if (written > MaxUnpackedBytes)
                 {
-                    throw new InvalidDataException("展開後のサイズが大きすぎます。");
+                    throw new InvalidDataException(Loc.Get("core.dl.extracttoolarge"));
                 }
 
                 target.Write(buffer, 0, read);
@@ -136,6 +137,6 @@ public static class UpdateDownloader
             .ToList();
         return candidates.Count == 1
             ? candidates[0]
-            : throw new InvalidDataException($"zip に {UpdateApplier.MainExe} が見つかりません。");
+            : throw new InvalidDataException(Loc.Get("core.dl.noexe", UpdateApplier.MainExe));
     }
 }

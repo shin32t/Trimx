@@ -4,6 +4,7 @@ using System.Windows.Threading;
 using Trimx.Core.Services;
 using Trimx.Services;
 using Trimx.UI;
+using Trimx.Core.Localization;
 
 namespace Trimx;
 
@@ -84,7 +85,7 @@ public partial class MainWindow
 
         if (failed > 0)
         {
-            MessageBox.Show(this, $"前回の作業のうち {failed} 件を復元できませんでした。", "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
+            MessageBox.Show(this, Loc.Get("err.restore", failed), "Trimx", MessageBoxButton.OK, MessageBoxImage.Warning);
         }
 
         return _tabs.Count > 0 || failed > 0;

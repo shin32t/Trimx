@@ -44,7 +44,11 @@ public partial class CanvasView : UserControl
 
         // The window background follows the theme, so the canvas does too.
         Loaded += (_, _) => ThemeService.Changed += OnThemeChanged;
-        Unloaded += (_, _) => ThemeService.Changed -= OnThemeChanged;
+        Unloaded += (_, _) =>
+        {
+            ThemeService.Changed -= OnThemeChanged;
+            ReleaseCaches();
+        };
     }
 
     private void OnThemeChanged(object? sender, EventArgs e) => Surface.InvalidateVisual();
@@ -70,6 +74,7 @@ public partial class CanvasView : UserControl
             }
 
             _tab = value;
+            ReleaseCaches();
 
             if (_tab is not null)
             {
@@ -132,6 +137,7 @@ public partial class CanvasView : UserControl
 
     private void OnDocumentChanged(object? sender, EventArgs e)
     {
+        InvalidateComposite();
         SyncTextEditor();
         Surface.InvalidateVisual();
     }
@@ -284,7 +290,19 @@ public partial class CanvasView : UserControl
         var sampling = _tab.Zoom >= 1f
             ? new SKSamplingOptions(SKFilterMode.Nearest, SKMipmapMode.None)
             : new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear);
-        CanvasRenderer.Render(document, canvas, sampling, exclude: _editingLayer);
+
+        // Zoomed out (the case that gets slow while resizing) the cached composite is scaled in one draw.
+        // At 100% or more, layers are drawn directly so text and shapes stay crisp.
+        var composite = _tab.Zoom < 1f ? GetComposite(document) : null;
+        if (composite is not null)
+        {
+            canvas.DrawImage(composite, new SKRect(0, 0, document.Width, document.Height), sampling);
+        }
+        else
+        {
+            CanvasRenderer.Render(document, canvas, sampling, exclude: _editingLayer);
+        }
+
         if (_penPoints is not null)
         {
             LayerRenderer.DrawStroke(canvas, _penPoints, PenColor, PenWidth);
@@ -319,26 +337,6 @@ public partial class CanvasView : UserControl
         paint.StrokeWidth = 1f / zoom;
         paint.Color = new SKColor(0x3A, 0x7B, 0xD5);
         canvas.DrawRect(bounds, paint);
-    }
-
-    private static void DrawCheckerboard(SKCanvas canvas, int width, int height)
-    {
-        using var light = new SKPaint { Color = new SKColor(0xCC, 0xCC, 0xCC) };
-        using var dark = new SKPaint { Color = new SKColor(0x99, 0x99, 0x99) };
-        const int cell = 8;
-
-        canvas.Save();
-        canvas.ClipRect(new SKRect(0, 0, width, height));
-        canvas.DrawRect(0, 0, width, height, light);
-        for (var y = 0; y < height; y += cell)
-        {
-            for (var x = (y / cell % 2) * cell; x < width; x += cell * 2)
-            {
-                canvas.DrawRect(x, y, cell, cell, dark);
-            }
-        }
-
-        canvas.Restore();
     }
 
     protected override void OnMouseWheel(MouseWheelEventArgs e)

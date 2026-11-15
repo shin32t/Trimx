@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Trimx.Core.Documents;
 using Trimx.Core.Rendering;
+using Trimx.Core.Localization;
 
 namespace Trimx.UI;
 
@@ -214,21 +215,21 @@ public partial class LayerPanel : UserControl
 
     private void OnAddEmpty(object sender, RoutedEventArgs e)
     {
-        RunLayerOperation("空のレイヤーを追加できませんでした。", () => _tab?.AddEmptyLayer("新規レイヤー"));
+        RunLayerOperation(Loc.Get("err.addlayer"), () => _tab?.AddEmptyLayer(Loc.Get("layer.new")));
     }
 
     private void OnDuplicate(object sender, RoutedEventArgs e)
     {
-        RunLayerOperation("レイヤーを複製できませんでした。", () => _tab?.DuplicateSelectedLayer("{0} のコピー"));
+        RunLayerOperation(Loc.Get("err.duplayer"), () => _tab?.DuplicateSelectedLayer(Loc.Get("layer.copy")));
     }
 
     private void OnMergeDown(object sender, RoutedEventArgs e)
     {
-        RunLayerOperation("レイヤーを結合できませんでした。", () =>
+        RunLayerOperation(Loc.Get("err.mergelayer"), () =>
         {
             if (_tab?.MergeSelectedDown() == false)
             {
-                MessageBox.Show(Window.GetWindow(this), "結合後の大きさが上限を超えるため、結合できません。", "Trimx", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(Window.GetWindow(this), Loc.Get("err.mergetoolarge"), "Trimx", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         });
     }
@@ -276,7 +277,7 @@ public partial class LayerPanel : UserControl
 
     private void OnRasterize(object sender, RoutedEventArgs e)
     {
-        RunLayerOperation("ラスタライズできませんでした。", () => _tab?.RasterizeSelectedLayer());
+        RunLayerOperation(Loc.Get("err.rasterize"), () => _tab?.RasterizeSelectedLayer());
     }
 
     private void OnListPreviewMouseDown(object sender, System.Windows.Input.MouseButtonEventArgs e)

@@ -1,85 +1,155 @@
 <Window x:Class="Trimx.UI.SettingsDialog"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="設定"
+        Title="{DynamicResource common.settings}"
         SizeToContent="WidthAndHeight"
-        ResizeMode="NoResize"
+        ResizeMode="CanResize"
+        MinWidth="360"
+        MinHeight="240"
         ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner"
         Background="{DynamicResource PanelBackgroundBrush}"
         Foreground="{DynamicResource ForegroundBrush}">
-    <StackPanel Margin="20"
-                MinWidth="320">
-        <TextBlock FontWeight="SemiBold"
-                   Text="テーマ" />
-        <RadioButton x:Name="SystemRadio"
-                     Margin="0,8,0,0"
-                     GroupName="Theme"
-                     Content="システムの設定に合わせる"
-                     Checked="OnThemeChecked" />
-        <RadioButton x:Name="DarkRadio"
-                     Margin="0,6,0,0"
-                     GroupName="Theme"
-                     Content="ダーク"
-                     Checked="OnThemeChecked" />
-        <RadioButton x:Name="LightRadio"
-                     Margin="0,6,0,0"
-                     GroupName="Theme"
-                     Content="ライト"
-                     Checked="OnThemeChecked" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-        <TextBlock Margin="0,18,0,0"
-                   FontWeight="SemiBold"
-                   Text="ツールバー" />
-        <CheckBox x:Name="LabelsCheck"
-                  Margin="0,8,0,0"
-                  Content="ボタンにラベルを表示する"
-                  Click="OnLabelsClick" />
+        <!-- The settings scroll when the window is made small; the footer stays visible -->
+        <ScrollViewer Grid.Row="0"
+                      VerticalScrollBarVisibility="Auto">
+            <StackPanel Margin="20,20,20,8"
+                        MinWidth="320">
+                <TextBlock FontWeight="SemiBold"
+                           Text="{DynamicResource settings.language}" />
+                <RadioButton x:Name="LangSystemRadio"
+                             Margin="0,8,0,0"
+                             GroupName="Language"
+                             Content="{DynamicResource settings.theme.system}"
+                             Checked="OnLanguageChecked" />
+                <RadioButton x:Name="LangJaRadio"
+                             Margin="0,6,0,0"
+                             GroupName="Language"
+                             Content="日本語"
+                             Checked="OnLanguageChecked" />
+                <RadioButton x:Name="LangEnRadio"
+                             Margin="0,6,0,0"
+                             GroupName="Language"
+                             Content="English"
+                             Checked="OnLanguageChecked" />
 
-        <TextBlock Margin="0,18,0,0"
-                   FontWeight="SemiBold"
-                   Text="更新" />
-        <CheckBox x:Name="AutoUpdateCheck"
-                  Margin="0,8,0,0"
-                  Content="起動時に新しいバージョンがあれば、自動で更新する"
-                  Click="OnAutoUpdateClick" />
+                <TextBlock Margin="0,18,0,0"
+                           FontWeight="SemiBold"
+                           Text="{DynamicResource settings.theme}" />
+                <RadioButton x:Name="SystemRadio"
+                             Margin="0,8,0,0"
+                             GroupName="Theme"
+                             Content="{DynamicResource settings.theme.system}"
+                             Checked="OnThemeChecked" />
+                <RadioButton x:Name="DarkRadio"
+                             Margin="0,6,0,0"
+                             GroupName="Theme"
+                             Content="{DynamicResource settings.theme.dark}"
+                             Checked="OnThemeChecked" />
+                <RadioButton x:Name="LightRadio"
+                             Margin="0,6,0,0"
+                             GroupName="Theme"
+                             Content="{DynamicResource settings.theme.light}"
+                             Checked="OnThemeChecked" />
 
-        <TextBlock Margin="0,18,0,0"
-                   FontWeight="SemiBold"
-                   Text="テキスト" />
-        <TextBlock Margin="0,8,0,0"
-                   Text="新しいテキストの初期文字列" />
-        <TextBox x:Name="DefaultTextBox"
-                 Margin="0,4,0,0"
-                 TextChanged="OnDefaultTextChanged" />
+                <TextBlock Margin="0,18,0,0"
+                           FontWeight="SemiBold"
+                           Text="{DynamicResource settings.toolbar}" />
+                <CheckBox x:Name="LabelsCheck"
+                          Margin="0,8,0,0"
+                          Content="{DynamicResource settings.labels}"
+                          Click="OnLabelsClick" />
 
-        <TextBlock Margin="0,18,0,0"
-                   FontWeight="SemiBold"
-                   Text="描画" />
-        <TextBlock Margin="0,6,0,0"
-                   TextWrapping="Wrap"
-                   Foreground="{DynamicResource SecondaryForegroundBrush}"
-                   Text="ペン・テキスト・図形は、前回使った色や太さなどを引き継ぎます。" />
-        <Button Margin="0,8,0,0"
-                HorizontalAlignment="Left"
-                Content="描画の設定をデフォルトに戻す"
-                Click="OnResetDrawingClick" />
+                <TextBlock Margin="0,18,0,0"
+                           FontWeight="SemiBold"
+                           Text="{DynamicResource settings.updates}" />
+                <CheckBox x:Name="AutoUpdateCheck"
+                          Margin="0,8,0,0"
+                          Content="{DynamicResource settings.autoupdate}"
+                          Click="OnAutoUpdateClick" />
+                <Button x:Name="CheckUpdateButton"
+                        Margin="0,8,0,0"
+                        Padding="12,3"
+                        HorizontalAlignment="Left"
+                        Content="{DynamicResource settings.checkupdate}"
+                        Click="OnCheckUpdateClick" />
+                <TextBlock x:Name="UpdateStatusText"
+                           Margin="0,6,0,0"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Visibility="Collapsed" />
 
-        <Border Margin="0,20,0,0"
+                <TextBlock Margin="0,18,0,0"
+                           FontWeight="SemiBold"
+                           Text="{DynamicResource common.text}" />
+                <TextBlock Margin="0,8,0,0"
+                           Text="{DynamicResource settings.deftext}" />
+                <TextBox x:Name="DefaultTextBox"
+                         Margin="0,4,0,0"
+                         TextChanged="OnDefaultTextChanged" />
+
+                <TextBlock Margin="0,18,0,0"
+                           FontWeight="SemiBold"
+                           Text="{DynamicResource settings.drawing}" />
+                <TextBlock Margin="0,6,0,0"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Text="{DynamicResource settings.drawing.note}" />
+                <Button Margin="0,8,0,0"
+                        HorizontalAlignment="Left"
+                        Content="{DynamicResource settings.drawing.reset}"
+                        Click="OnResetDrawingClick" />
+
+                <TextBlock Margin="0,18,0,0"
+                           FontWeight="SemiBold"
+                           Text="{DynamicResource settings.temp}" />
+                <TextBlock Margin="0,6,0,0"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Text="{DynamicResource settings.temp.note}" />
+                <Button Margin="0,8,0,0"
+                        Padding="12,3"
+                        HorizontalAlignment="Left"
+                        Content="{DynamicResource settings.temp.clear}"
+                        Click="OnClearTempClick" />
+                <TextBlock x:Name="TempStatusText"
+                           Margin="0,6,0,0"
+                           TextWrapping="Wrap"
+                           Foreground="{DynamicResource SecondaryForegroundBrush}"
+                           Visibility="Collapsed" />
+            </StackPanel>
+        </ScrollViewer>
+
+        <Border Grid.Row="1"
+                Margin="20,0,20,16"
                 Padding="0,12,0,0"
                 BorderBrush="{DynamicResource BorderBrush}"
                 BorderThickness="0,1,0,0">
             <DockPanel>
                 <Button MinWidth="80"
                         Margin="12,0,0,0"
+                        VerticalAlignment="Center"
                         DockPanel.Dock="Right"
                         IsDefault="True"
                         IsCancel="True"
-                        Content="閉じる" />
-                <TextBlock x:Name="CopyrightText"
-                           VerticalAlignment="Center"
-                           Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                        Content="{DynamicResource common.close}" />
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock x:Name="CopyrightText"
+                               Foreground="{DynamicResource SecondaryForegroundBrush}" />
+                    <TextBlock FontSize="11">
+                        <Hyperlink x:Name="WebsiteLink"
+                                   Foreground="{DynamicResource AccentBrush}"
+                                   NavigateUri="https://urashiba.net/products/trimx"
+                                   RequestNavigate="OnWebsiteNavigate">https://urashiba.net/products/trimx</Hyperlink>
+                    </TextBlock>
+                </StackPanel>
             </DockPanel>
         </Border>
-    </StackPanel>
+    </Grid>
 </Window>

@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Windows.Data;
 using Trimx.Core.Documents;
+using Trimx.Core.Localization;
 
 namespace Trimx.UI;
 
@@ -13,9 +14,9 @@ public sealed class LayerKindConverter : IValueConverter
     {
         return value switch
         {
-            ImageLayer => "画像",
-            TextLayer => "テキスト",
-            ShapeLayer => "図形",
+            ImageLayer => Loc.Get("common.image"),
+            TextLayer => Loc.Get("common.text"),
+            ShapeLayer => Loc.Get("common.shape"),
             _ => string.Empty,
         };
     }

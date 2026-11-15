@@ -16,7 +16,7 @@
     <TextBlock x:Name="EmptyText"
                Margin="12,14,12,0"
                Foreground="{DynamicResource SecondaryForegroundBrush}"
-               Text="テキストまたは図形のレイヤーを選ぶと、ここに設定が表示されます。"
+               Text="{DynamicResource props.hint}"
                TextWrapping="Wrap" />
     <StackPanel x:Name="RootPanel"
                 Margin="10,4,10,10"
@@ -29,7 +29,7 @@
         <StackPanel x:Name="TextSection"
                     Visibility="Collapsed">
             <TextBlock Style="{StaticResource FieldLabelStyle}"
-                       Text="内容" />
+                       Text="{DynamicResource props.content}" />
             <TextBox x:Name="ContentBox"
                      MinHeight="56"
                      MaxHeight="120"
@@ -39,7 +39,7 @@
                      TextChanged="OnContentChanged" />
 
             <TextBlock Style="{StaticResource FieldLabelStyle}"
-                       Text="フォント" />
+                       Text="{DynamicResource props.font}" />
             <Button x:Name="FontButton"
                     HorizontalContentAlignment="Left"
                     Click="OnFontButtonClick" />
@@ -60,7 +60,7 @@
             </Popup>
 
             <TextBlock Style="{StaticResource FieldLabelStyle}"
-                       Text="サイズ (px)" />
+                       Text="{DynamicResource props.sizepx}" />
             <TextBox x:Name="FontSizeBox"
                      TextChanged="OnFontSizeChanged" />
 
@@ -68,27 +68,27 @@
                         Orientation="Horizontal">
                 <CheckBox x:Name="BoldCheck"
                           Margin="0,0,16,0"
-                          Content="太字"
+                          Content="{DynamicResource props.bold}"
                           FontWeight="Bold"
                           Click="OnBoldClick" />
                 <CheckBox x:Name="ItalicCheck"
-                          Content="斜体"
+                          Content="{DynamicResource props.italic}"
                           FontStyle="Italic"
                           Click="OnItalicClick" />
             </StackPanel>
 
             <TextBlock Style="{StaticResource FieldLabelStyle}"
-                       Text="文字色" />
+                       Text="{DynamicResource props.textcolor}" />
             <ui:ColorField x:Name="TextColorField"
                            ColorChanged="OnTextColorChanged"
                            EditCompleted="OnColorEditCompleted" />
 
             <TextBlock Style="{StaticResource FieldLabelStyle}"
-                       Text="縁取りの太さ (px、0 で縁なし)" />
+                       Text="{DynamicResource props.outlinewidth}" />
             <TextBox x:Name="OutlineWidthBox"
                      TextChanged="OnOutlineWidthChanged" />
             <TextBlock Style="{StaticResource FieldLabelStyle}"
-                       Text="縁取りの色" />
+                       Text="{DynamicResource props.outlinecolor}" />
             <ui:ColorField x:Name="OutlineColorField"
                            ColorChanged="OnOutlineColorChanged"
                            EditCompleted="OnColorEditCompleted" />
@@ -105,58 +105,58 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock Style="{StaticResource FieldLabelStyle}"
-                               Text="幅 (px)" />
+                               Text="{DynamicResource props.widthpx}" />
                     <TextBox x:Name="ShapeWidthBox"
                              TextChanged="OnShapeWidthChanged" />
                 </StackPanel>
                 <StackPanel Grid.Column="2">
                     <TextBlock Style="{StaticResource FieldLabelStyle}"
-                               Text="高さ (px)" />
+                               Text="{DynamicResource props.heightpx}" />
                     <TextBox x:Name="ShapeHeightBox"
                              TextChanged="OnShapeHeightChanged" />
                 </StackPanel>
             </Grid>
 
             <TextBlock Style="{StaticResource FieldLabelStyle}"
-                       Text="線の太さ (px)" />
+                       Text="{DynamicResource props.strokewidth}" />
             <TextBox x:Name="StrokeWidthBox"
                      TextChanged="OnStrokeWidthChanged" />
 
             <TextBlock Style="{StaticResource FieldLabelStyle}"
-                       Text="線の種類" />
+                       Text="{DynamicResource props.dash}" />
             <StackPanel Orientation="Horizontal">
                 <RadioButton x:Name="SolidRadio"
                              Margin="0,0,14,0"
-                             Content="実線"
+                             Content="{DynamicResource props.dash.solid}"
                              GroupName="ShapeDash"
                              Click="OnDashClick" />
                 <RadioButton x:Name="DashedRadio"
                              Margin="0,0,14,0"
-                             Content="破線"
+                             Content="{DynamicResource props.dash.dashed}"
                              GroupName="ShapeDash"
                              Click="OnDashClick" />
                 <RadioButton x:Name="DottedRadio"
-                             Content="点線"
+                             Content="{DynamicResource props.dash.dotted}"
                              GroupName="ShapeDash"
                              Click="OnDashClick" />
             </StackPanel>
 
             <StackPanel x:Name="RadiusSection">
                 <TextBlock Style="{StaticResource FieldLabelStyle}"
-                           Text="角の丸み (px)" />
+                           Text="{DynamicResource props.radius}" />
                 <TextBox x:Name="CornerRadiusBox"
                          TextChanged="OnCornerRadiusChanged" />
             </StackPanel>
 
             <TextBlock Style="{StaticResource FieldLabelStyle}"
-                       Text="線の色" />
+                       Text="{DynamicResource props.strokecolor}" />
             <ui:ColorField x:Name="StrokeColorField"
                            ColorChanged="OnStrokeColorChanged"
                            EditCompleted="OnColorEditCompleted" />
 
             <StackPanel x:Name="FillSection">
                 <TextBlock Style="{StaticResource FieldLabelStyle}"
-                           Text="塗りつぶし" />
+                           Text="{DynamicResource props.fill}" />
                 <ui:ColorField x:Name="FillColorField"
                                ShowNoneButton="True"
                                ColorChanged="OnFillColorChanged"
@@ -169,7 +169,7 @@
                     Visibility="Collapsed">
             <CheckBox x:Name="ShadowCheck"
                       Margin="0,12,0,0"
-                      Content="影"
+                      Content="{DynamicResource props.shadow}"
                       Click="OnShadowClick" />
             <StackPanel x:Name="ShadowOptions"
                         Margin="0,0,0,0">
@@ -180,7 +180,7 @@
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center" />
                     <TextBlock VerticalAlignment="Center"
-                               Text="濃さ"
+                               Text="{DynamicResource props.shadow.strength}"
                                Width="48" />
                     <Slider x:Name="ShadowOpacitySlider"
                             Minimum="0"
@@ -195,7 +195,7 @@
                                HorizontalAlignment="Right"
                                VerticalAlignment="Center" />
                     <TextBlock VerticalAlignment="Center"
-                               Text="ぼかし"
+                               Text="{DynamicResource props.shadow.blur}"
                                Width="48" />
                     <Slider x:Name="ShadowBlurSlider"
                             Minimum="0"
@@ -211,13 +211,13 @@
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0">
                     <TextBlock Style="{StaticResource FieldLabelStyle}"
-                               Text="影のずれ 横 (px)" />
+                               Text="{DynamicResource props.shadow.offsetx}" />
                     <TextBox x:Name="ShadowOffsetXBox"
                              TextChanged="OnShadowOffsetChanged" />
                 </StackPanel>
                 <StackPanel Grid.Column="2">
                     <TextBlock Style="{StaticResource FieldLabelStyle}"
-                               Text="縦 (px)" />
+                               Text="{DynamicResource props.shadow.offsety}" />
                     <TextBox x:Name="ShadowOffsetYBox"
                              TextChanged="OnShadowOffsetChanged" />
                 </StackPanel>
